@@ -1,65 +1,63 @@
-import { SafeAreaView, View, Image, Platform } from "react-native";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import { insertFeed, getFeeds, deleteFeed } from '@/services/database/rssFeeds';
+
+interface Feed {
+  id: number;
+  title: string;
+  url: string;
+  created_at: string;
+}
 
 export default function HomeScreen() {
+  const [url, setUrl] = useState('');
+  const [feeds, setFeeds] = useState<Feed[]>([]);
+
+  useEffect(() => {
+    fetchFeeds();
+  }, []);
+
+  const fetchFeeds = async () => {
+    const data = await getFeeds();
+    setFeeds(data);
+  };
+
+  const handleAddFeed = async () => {
+    if (!url.trim()) return;
+    await insertFeed(url, url);
+    console.log('✅ Feed added');
+    setUrl('');
+    fetchFeeds();
+  };
+
+  const handleDeleteFeed = async (id: number) => {
+    await deleteFeed(id);
+    fetchFeeds();
+  };
+
   return (
-      <SafeAreaView className="flex-1">
-        <ThemedText type="title">Welcome to ParadiseRSS</ThemedText>
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-            headerImage={
-              <Image
-                  source={require("@/assets/images/partial-react-logo.png")}
-                  className="absolute bottom-0 left-0 h-[178px] w-[290px]"
-              />
-            }
-        >
-          <ThemedView className="flex-row items-center gap-2">
-            <ThemedText type="title">Welcome!</ThemedText>
-            <HelloWave />
-          </ThemedView>
+      <View className="p-4">
+        <Text className="text-xl font-bold">Subscribe to RSS Feeds</Text>
+        <TextInput
+            className="border p-2 my-2 text-white"
+            placeholder="Enter RSS Feed URL"
+            value={url}
+            onChangeText={setUrl}
+        />
+        <Button title="Add Feed" onPress={handleAddFeed} />
 
-          <ThemedView className="gap-2 mb-2">
-            <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-            <ThemedText>
-              Edit{" "}
-              <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-              to see changes. Press{" "}
-              <ThemedText type="defaultSemiBold">
-                {Platform.select({
-                  ios: "cmd + d",
-                  android: "cmd + m",
-                  web: "F12",
-                })}
-              </ThemedText>{" "}
-              to open developer tools.
-            </ThemedText>
-          </ThemedView>
-
-          <ThemedView className="gap-2 mb-2">
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-            <ThemedText>
-              Tap the Explore tab to learn more about what's included in this
-              starter app.
-            </ThemedText>
-          </ThemedView>
-
-          <ThemedView className="gap-2 mb-2">
-            <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-            <ThemedText>
-              When you're ready, run{" "}
-              <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-              to get a fresh{" "}
-              <ThemedText type="defaultSemiBold">app</ThemedText> directory. This
-              will move the current{" "}
-              <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-              <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-            </ThemedText>
-          </ThemedView>
-        </ParallaxScrollView>
-      </SafeAreaView>
+        <FlatList
+            data={feeds}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => (
+                <View className="flex-row justify-between p-2 border-b">
+                  <Text className="text-white">{item.url}</Text>
+                  <TouchableOpacity onPress={() => handleDeleteFeed(item.id)}>
+                    <Text className="text-red-500">Delete</Text>
+                  </TouchableOpacity>
+                </View>
+            )}
+        />
+      </View>
   );
 }
