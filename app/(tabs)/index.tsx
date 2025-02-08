@@ -2,24 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 import { insertFeed, getFeeds, deleteFeed } from '@/services/database/rssFeeds';
 import { fetchRSSFeed } from '@/services/rss-parser/fetchRSSFeed.ts';
-
-interface Feed {
-    id: number;
-    title: string;
-    url: string;
-    created_at: string;
-}
-
-interface Article {
-    title: string;
-    link: string;
-    date: string;
-    creator?: string;
-    content?: string;
-    description?: string;
-    categories?: string;
-    isoDate?: string;
-}
+import { Feed } from '@/services/database/rssFeeds';
+import { Article } from '@/services/database/rssArticles.ts';
 
 export default function HomeScreen() {
     const [url, setUrl] = useState('');

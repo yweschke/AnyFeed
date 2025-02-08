@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { openDatabase } from './feeds.ts';
 
-interface Feed {
+export interface Feed {
     id: number;
     title: string;
     url: string;
