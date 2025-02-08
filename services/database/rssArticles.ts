@@ -1,4 +1,3 @@
-import * as SQLite from 'expo-sqlite';
 import { openDatabase, Feed } from './feeds.ts';
 
 export interface Article {
@@ -10,15 +9,6 @@ export interface Article {
     description?: string;
     categories?: string;
     isoDate?: string;
-}
-
-async function openDatabase() {
-    try {
-        return SQLite.openDatabaseAsync('rssArticles.db');
-    } catch (error) {
-        console.error('❌ Failed to open database:', error);
-        throw error;
-    }
 }
 
 export const setupDatabase = async () => {
@@ -97,6 +87,15 @@ export const deleteArticles = async (feedId: Feed.id) => {
         console.error('❌ Error deleting articles:', error);
     }
 }
+export const deleteOldArticles = async () => {
+    try {
+        const db = await openDatabase();
+        await db.runAsync(`DELETE FROM rssArticles WHERE date(isoDate) <= date('now', '-31 days');`);
+        console.log("✅ Old articles deleted");
+    } catch (error) {
+        console.error("❌ Error deleting old articles:", error);
+    }
+};
 
 export const deleteArticle = async (id: number) => {
     try {

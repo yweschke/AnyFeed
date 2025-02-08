@@ -1,4 +1,3 @@
-import * as SQLite from 'expo-sqlite';
 import { openDatabase } from './feeds.ts';
 
 export interface Feed {
@@ -63,5 +62,3 @@ export const deleteFeed = async (id: number) => {
         console.error('❌ Error deleting feed:', error);
     }
 };
-
-export default openDatabase;
