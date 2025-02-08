@@ -1,18 +1,17 @@
 import * as SQLite from 'expo-sqlite';
+import { openDatabase } from './feeds.ts';
 
-async function openDatabase() {
-    try {
-        return SQLite.openDatabaseAsync('rssFeeds.db');
-    } catch (error) {
-        console.error('❌ Failed to open database:', error);
-        throw error;
-    }
+interface Feed {
+    id: number;
+    title: string;
+    url: string;
+    created_at: string;
 }
 
 export const setupDatabase = async () => {
     try {
         const db = await openDatabase();
-        await db.execAsync(`CREATE TABLE IF NOT EXISTS feeds (
+        await db.execAsync(`CREATE TABLE IF NOT EXISTS rssFeeds (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             url TEXT UNIQUE NOT NULL,
@@ -35,7 +34,7 @@ export const insertFeed = async (title: string, url: string) => {
     }
 };
 
-export const getFeeds = async (): Promise<any[]> => {
+export const getFeeds = async (): Promise<Feed[]> => {
     try {
         const db = await openDatabase();
         return await db.getAllAsync(`SELECT * FROM feeds;`);
