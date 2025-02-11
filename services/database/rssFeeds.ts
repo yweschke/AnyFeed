@@ -24,9 +24,8 @@ export const setupDatabase = async () => {
 
 export const insertFeed = async (title: string, url: string) => {
     try {
-        console.log(`🚀 Adding feed: ${title} - ${url}`);
         const db = await openDatabase();
-        await db.runAsync(`INSERT INTO feeds (title, url) VALUES (?, ?);`, [title, url]);
+        await db.runAsync(`INSERT INTO rssFeeds (title, url) VALUES (?, ?);`, [title, url]);
         console.log('✅ Feed inserted successfully');
     } catch (error) {
         console.error('❌ Error inserting feed:', error);
@@ -36,7 +35,7 @@ export const insertFeed = async (title: string, url: string) => {
 export const getFeeds = async (): Promise<Feed[]> => {
     try {
         const db = await openDatabase();
-        return await db.getAllAsync(`SELECT * FROM feeds;`);
+        return await db.getAllAsync(`SELECT * FROM rssFeeds;`);
     } catch (error) {
         console.error('❌ Error fetching feeds:', error);
         return [];
@@ -46,7 +45,7 @@ export const getFeeds = async (): Promise<Feed[]> => {
 export const updateFeed = async (id: number, title: string, url: string) => {
     try {
         const db = await openDatabase();
-        await db.runAsync(`UPDATE feeds SET title = ?, url = ? WHERE id = ?;`, [title, url, id]);
+        await db.runAsync(`UPDATE rssFeeds SET title = ?, url = ? WHERE id = ?;`, [title, url, id]);
         console.log('✅ Feed updated successfully');
     } catch (error) {
         console.error('❌ Error updating feed:', error);
@@ -56,7 +55,7 @@ export const updateFeed = async (id: number, title: string, url: string) => {
 export const deleteFeed = async (id: number) => {
     try {
         const db = await openDatabase();
-        await db.runAsync(`DELETE FROM feeds WHERE id = ?;`, [id]);
+        await db.runAsync(`DELETE FROM rssFeeds WHERE id = ?;`, [id]);
         console.log('✅ Feed deleted successfully');
     } catch (error) {
         console.error('❌ Error deleting feed:', error);

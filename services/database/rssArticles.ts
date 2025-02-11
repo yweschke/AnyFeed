@@ -87,6 +87,7 @@ export const deleteArticles = async (feedId: Feed.id) => {
         console.error('❌ Error deleting articles:', error);
     }
 }
+
 export const deleteOldArticles = async () => {
     try {
         const db = await openDatabase();

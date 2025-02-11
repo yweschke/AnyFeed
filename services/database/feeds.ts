@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 
-async function openDatabase() {
+export async function openDatabase() {
     try {
         return SQLite.openDatabaseAsync('Feeds.db');
     } catch (error) {
