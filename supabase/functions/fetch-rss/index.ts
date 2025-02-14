@@ -1,9 +1,7 @@
 // Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { serve } from "https://deno.land/std@0.119.0/http/server.ts";
-import Parser from "npm:rss-parser";
-
-const parser = new Parser();
+import { parseFeed } from "npm:@rowanmanning/feed-parser";
 
 serve(async (req) => {
   // Get the RSS URL from query parameters
@@ -16,18 +14,16 @@ serve(async (req) => {
 
   try {
     console.log(`📡 Fetching RSS from: ${rssUrl}`);
-    const feed = await parser.parseURL(rssUrl);
-    // Convert feed into a clean JSON format
-    const articles = feed.items.map((item) => ({
-      title: item.title || "No title",
-      link: item.link || "",
-      date: item.pubDate || "Unknown date",
-      creator: item.creator || "",
-      content: item.content || "No content provided",
-      description: item.contentSnippet || "",
-      categories: item.categories || [],
-      isoDate: item.isoDate || "",
-    }));
+
+    // Fetch RSS XML from the given URL
+    const response = await fetch(rssUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Parse the RSS feed
+    const feed = parseFeed(await response.text());
+    const articles = feed.items;
 
     return new Response(JSON.stringify(articles), {
       headers: { "Content-Type": "application/json" },
