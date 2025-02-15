@@ -1,15 +1,9 @@
 import { openDatabase, Feed } from './feeds.ts';
 
-export interface Article {
-    title: string;
-    link: string;
-    date: string;
-    creator?: string;
-    content?: string;
-    description?: string;
-    categories?: string;
-    isoDate?: string;
-}
+
+export interface
+
+export interface Category {
 
 export const setupDatabase = async () => {
     try {
