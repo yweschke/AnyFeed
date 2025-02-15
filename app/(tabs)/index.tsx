@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Image } from 'react-native';
 import { insertFeed, getFeeds, deleteFeed } from '@/services/database/rssFeeds';
 import { fetchRSSFeed } from '@/services/rss-parser/fetchRSSFeed.ts';
-import { Feed } from '@/services/database/rssFeeds';
-import { Article } from '@/services/database/rssArticles.ts';
+import { Feed } from '@/types/rssFeed/feed.ts';
+import { Article } from '@/types/rssFeed/article.ts';
 
 export default function HomeScreen() {
     const [url, setUrl] = useState('');
@@ -11,42 +11,61 @@ export default function HomeScreen() {
     const [articles, setArticles] = useState<{ [key: string]: Article[] }>({});
 
     useEffect(() => {
-        fetchFeeds();
+        const fetchData = async () => {
+            await fetchFeeds();
+        };
+        fetchData();
     }, []);
 
-    const fetchFeeds = async () => {
-        const data = await getFeeds();
-        setFeeds(data);
-    };
-
-    // Fetch articles when feeds update
     useEffect(() => {
+        if (feeds.length === 0) return;
+
         const loadArticles = async () => {
             for (const feed of feeds) {
                 await fetchArticles(feed.url);
             }
         };
-        if (feeds.length > 0) {
-            loadArticles();
-        }
+
+        loadArticles();
     }, [feeds]);
 
+    const fetchFeeds = async () => {
+        try {
+            const data = await getFeeds();
+            setFeeds(data);
+        } catch (error) {
+            console.error("❌ Error fetching feeds:", error);
+        }
+    };
+
     const fetchArticles = async (feedUrl: string) => {
-        const fetchedArticles = await fetchRSSFeed(feedUrl);
-        setArticles(prev => ({ ...prev, [feedUrl]: fetchedArticles }));
+        try {
+            const fetchedArticles = await fetchRSSFeed(feedUrl);
+            setArticles(prev => ({ ...prev, [feedUrl]: fetchedArticles }));
+        } catch (error) {
+            console.error(`❌ Error fetching articles for ${feedUrl}:`, error);
+        }
     };
 
     const handleAddFeed = async () => {
         if (!url.trim()) return;
-        await insertFeed(url, url);
-        console.log('✅ Feed added');
-        setUrl('');
-        fetchFeeds();
+        try {
+            await insertFeed(url, url);
+            console.log('✅ Feed added');
+            setUrl('');
+            await fetchFeeds();
+        } catch (error) {
+            console.error("❌ Error adding feed:", error);
+        }
     };
 
     const handleDeleteFeed = async (id: number) => {
-        await deleteFeed(id);
-        fetchFeeds();
+        try {
+            await deleteFeed(id);
+            await fetchFeeds();
+        } catch (error) {
+            console.error("❌ Error deleting feed:", error);
+        }
     };
 
     return (
@@ -79,9 +98,18 @@ export default function HomeScreen() {
                                 keyExtractor={(article, index) => index.toString()}
                                 renderItem={({ item }) => (
                                     <View className="p-2 border-b">
-                                        <Text className="text-lg font-semibold">{item.title}</Text>
-                                        <Text className="text-gray-600">{item.date}</Text>
-                                        <Text>{item.description}</Text>
+                                        {/* Display Image if Available */}
+                                        {item.image?.url && (
+                                            <Image
+                                                source={{ uri: item.image.url }}
+                                                style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 5 }}
+                                            />
+                                        )}
+                                        <Text className="text-lg font-semibold text-gray-600">{item.title}</Text>
+                                        <Text className="text-gray-600">
+                                            {item.published ? new Date(item.published).toLocaleDateString() : "No date available"}
+                                        </Text>
+                                        <Text className="text-white">{item.description}</Text>
                                     </View>
                                 )}
                             />

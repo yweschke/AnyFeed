@@ -1,11 +1,5 @@
 import { openDatabase } from './feeds.ts';
-
-export interface Feed {
-    id: number;
-    title: string;
-    url: string;
-    created_at: string;
-}
+import { Feed } from '@/types/rssFeed/feed.ts';
 
 export const setupDatabase = async () => {
     try {
