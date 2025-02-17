@@ -10,8 +10,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { setupDatabase } from "@/services/database/rssFeeds";
 import { supabase } from "@/services/supabase/supabaseClient.ts"; // Import Supabase client
 import Auth from "@/app/auth/auth.tsx"; // Import auth screen
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+import '@/services/i18n/config.ts';// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {

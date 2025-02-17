@@ -9,6 +9,7 @@ import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
 export default function HomeScreen() {
     const [url, setUrl] = useState("");
     const [articles, setArticles] = useState<Article[]>([]);
+    const [unreadArticles, setUnreadArticles] = useState<Article[]>([]);
 
     useEffect(() => {
         const fetchAllArticles = async () => {

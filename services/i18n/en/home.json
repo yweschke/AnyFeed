@@ -1,0 +1,10 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "Good Morning{{name}}!",
+      "afternoon": "Good Afternoon{{name}}!",
+      "evening": "Good Evening{{name}}!",
+      "unreadArticles": "You have {{unreadArticles}} unread articles."
+    }
+  }
+}
