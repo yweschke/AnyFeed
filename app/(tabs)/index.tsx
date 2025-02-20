@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, ScrollView } from "react-native";
+import { SafeAreaView, Text, TextInput, Button, ScrollView } from "react-native";
 import { fetchRSSFeed } from "@/services/rss-parser/fetchRSSFeed.ts";
 import { insertFeed, getFeeds, deleteFeed } from "@/services/database/rssFeeds";
 import { Article } from "@/types/rssFeed/article.ts";
@@ -52,23 +52,8 @@ export default function HomeScreen() {
     };
 
     return (
-        <View className="p-4">
-            <Text className="text-xl font-bold mb-2">Subscribe to RSS Feeds</Text>
+        <SafeAreaView className="flex-1">
             <HelloUserLabel />
-            <TextInput
-                className="border border-gray-300 p-2 my-2 text-white rounded-md"
-                placeholder="Enter RSS Feed URL"
-                value={url}
-                onChangeText={setUrl}
-            />
-            <Button title="Add Feed" onPress={handleAddFeed} />
-
-            {/* ScrollView to render all articles */}
-            <ScrollView className="mt-4">
-                {articles.map((article, index) => (
-                    <ArticleCard key={index} article={article} onPress={() => console.log("Open", article.url)} />
-                ))}
-            </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
