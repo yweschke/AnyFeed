@@ -16,9 +16,10 @@ export const setupDatabase = async () => {
                 description TEXT,
                 published TEXT,
                 updated TEXT,
-                authors TEXT,     -- Store as JSON string
-                categories TEXT,  -- Store as JSON string
-                images TEXT       -- Store as JSON string
+                authors TEXT,     
+                categories TEXT,  
+                images TEXT,
+                unread BOOLEAN NOT NULL DEFAULT 1
             );
         `);
 
@@ -69,7 +70,8 @@ export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
             updated: row.updated ? new Date(row.updated) : undefined,
             authors: JSON.parse(row.authors || "[]"),       // Convert JSON to array
             categories: JSON.parse(row.categories || "[]"), // Convert JSON to array
-            image: JSON.parse(row.images || "[]")          // Convert JSON to array
+            image: JSON.parse(row.images || "[]"),
+            unread: row.unread === 1// Convert to boolan
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
@@ -95,7 +97,8 @@ export const getArticle = async (id: number): Promise<Article | null> => {
             updated: rawArticle.updated ? new Date(rawArticle.updated) : undefined,
             authors: JSON.parse(rawArticle.authors || "[]"),       // Convert JSON to array
             categories: JSON.parse(rawArticle.categories || "[]"), // Convert JSON to array
-            image: JSON.parse(rawArticle.images || "[]")          // Convert JSON to array
+            image: JSON.parse(rawArticle.images || "[]"),
+            unread: rawArticle.unread === 1 // Convert to boolean
         };
     } catch (error) {
         console.error("❌ Error fetching article:", error);
@@ -118,7 +121,8 @@ export const updateArticle = async (id: number, article: Article) => {
                  updated = ?,
                  authors = ?,
                  categories = ?,
-                 images = ?
+                 images = ?,
+                 unread = ?
              WHERE id = ?;`,
             [
                 article.title,
@@ -130,7 +134,8 @@ export const updateArticle = async (id: number, article: Article) => {
                 JSON.stringify(article.authors),      // Convert authors array to JSON string
                 JSON.stringify(article.categories),   // Convert categories array to JSON string
                 JSON.stringify(article.image),        // Convert images array to JSON string
-                id
+                id,
+                article.unread ? 1 : 0
             ]
         );
 
@@ -139,6 +144,28 @@ export const updateArticle = async (id: number, article: Article) => {
         console.error('❌ Error updating article:', error);
     }
 };
+
+export const setToRead = async (id: number) => {
+    try {
+        const db = await openDatabase();
+
+        await db.runAsync(`UPDATE rssArticles SET unread = 0 WHERE id = ?;`, [id]);
+        console.log(`✅ Article with ID ${id} marked as read`);
+    } catch (error) {
+        console.error('❌ Error marking article as read:', error);
+    }
+}
+
+export const setToUnread = async (id: number) => {
+    try {
+        const db = await openDatabase();
+
+        await db.runAsync(`UPDATE rssArticles SET unread = 1 WHERE id = ?;`, [id]);
+        console.log(`✅ Article with ID ${id} marked as unread`);
+    } catch (error) {
+        console.error('❌ Error marking article as unread:', error);
+    }
+}
 
 export const deleteArticles = async (feedId: Feed.id) => {
     try {

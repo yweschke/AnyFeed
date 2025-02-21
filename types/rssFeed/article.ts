@@ -8,6 +8,7 @@ export interface Article {
     title?: string;
     updated?: Date;
     url: string;
+    unread: boolean;
 }
 
 export interface Author {
