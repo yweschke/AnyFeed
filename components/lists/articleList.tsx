@@ -3,6 +3,8 @@ import { Animated, View } from 'react-native';
 import { Article } from '@/types/rssFeed/article';
 import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
 import ArticleCard from "@/components/cards/articleCard.tsx";
+import ArticleBigCard from "@/components/cards/articleBigCard.tsx";
+import FeedCard from "@/components/cards/feedCard.tsx";
 
 export default function ArticleList({ articles }: { articles: Article[] }) {
     const scrollY = useRef(new Animated.Value(0)).current;
@@ -23,6 +25,8 @@ export default function ArticleList({ articles }: { articles: Article[] }) {
         extrapolate: "clamp",
     });
 
+    const articleArray : Article[] = articles.slice(0, 4);
+
     return (
         <View className="flex-1">
             {/* ✅ Pass scroll animations as props */}
@@ -40,10 +44,10 @@ export default function ArticleList({ articles }: { articles: Article[] }) {
                     { useNativeDriver: false } // `false` because `height` can't be animated with `nativeDriver`
                 )}
             >
-                {articles.map((article, index) => (
-                    <ArticleCard key={index} article={article} />
-                ))}
+                <View className="justify-center items-center w-full">
+                    <FeedCard articles={articleArray} />
+                </View>
             </Animated.ScrollView>
         </View>
-    );
+    );r
 }

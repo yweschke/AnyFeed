@@ -1,18 +1,28 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Article } from "@/types/rssFeed/article.ts";
 
-export default function ArticleCard({ article}: { article: Article; onPress: () => void }) {
+export default function ArticleCard({ article, onPress }: { article: Article; onPress: () => void }) {
     return (
-        <TouchableOpacity className="bg-gray-700 m-2 rounded-2xl shadow-md w-100">
-            {/* Article Content */}
-            <View className="p-3">
-                <Image
-                    className="w-full h-52 rounded-lg"
-                    source={{uri: article.image?.url}}
-            />
-                <Text className="text-white font-bold text-lg">{article.title}</Text>
-                <Text className="text-white opacity-80">{article.description}</Text>
+        <TouchableOpacity
+            onPress={onPress}
+            className="bg-gray-700 my-1 mx-2 p-2 rounded-lg flex-row items-center"
+        >
+            <View className="flex-1  pr-2">
+                <Text className="text-white font-bold text-sm" numberOfLines={2}>
+                    {article.title}
+                </Text>
+                <Text className="text-white opacity-80 text-xs mt-1" numberOfLines={2}>
+                    {article.description}
+                </Text>
             </View>
+
+            {/* Image on the Right */}
+            {article.image?.url && (
+                <Image
+                    className="w-20 h-20 rounded-md"
+                    source={{ uri: article.image.url }}
+                />
+            )}
         </TouchableOpacity>
     );
 }

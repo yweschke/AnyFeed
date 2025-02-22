@@ -56,7 +56,7 @@ serve(async (req) => {
     // Transform RSS items into the `Article` interface
     const articles: Article[] = feed.items.map((item) => ({
       title: item.title || "No title",
-      url: item.link || "",
+      url: item.url || "",
       description: item.description || "",
       content: item.content || "No content available",
       published: item.published ? new Date(item.published) : undefined,

@@ -29,7 +29,7 @@ export default function HomeScreen() {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 ">
             <ArticleList articles={articles} />
         </SafeAreaView>
     );

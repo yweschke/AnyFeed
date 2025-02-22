@@ -13,7 +13,7 @@ export default function HelloUserLabel({ articles, headerHeight, unreadOpacity }
     const { t } = useTranslation("home");
     const [greeting, setGreeting] = useState("");
     const [username, setUsername] = useState<string | null>(null);
-    const [articleCount, setArticleCount] = useState<number>(0);
+    const [articleCount, setArticleCount] = useState<string>("0");
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -29,7 +29,8 @@ export default function HelloUserLabel({ articles, headerHeight, unreadOpacity }
     useEffect(() => {
         const updateGreeting = () => {
             const hours = new Date().getHours();
-            setArticleCount(articles?.length ?? 0);
+            const count = articles?.length ?? 0;
+            count <= 1000 ? setArticleCount(count) : setArticleCount("1000+");
 
             if (hours < 12) {
                 setGreeting(t("home.greeting.morning", { name: username ? ", " + username : "" }));
