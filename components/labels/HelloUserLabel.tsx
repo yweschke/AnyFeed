@@ -46,11 +46,11 @@ export default function HelloUserLabel({ articles, headerHeight, unreadOpacity }
 
     return (
         <Animated.View
-            className="absolute top-0 left-0 right-0 bg-gray-950 justify-center px-4"
+            className="absolute top-0 left-0 right-0 bg-light-bg-primary dark:bg-dark-bg-primary justify-center px-4"
             style={{ height: headerHeight, zIndex: 1000, elevation: 4 }}
         >
-            <Text className="text-3xl font-bold text-white pt-8">{greeting}</Text>
-            <Animated.Text className="text-2xl text-white" style={{ opacity: unreadOpacity }}>
+            <Text className="text-3xl font-bold text-light-text dark:text-dark-text pt-8">{greeting}</Text>
+            <Animated.Text className="text-2xl text-light-text dark:text-dark-text" style={{ opacity: unreadOpacity }}>
                 {t("home.greeting.unreadArticles", { unreadArticles: articleCount })}
             </Animated.Text>
         </Animated.View>
