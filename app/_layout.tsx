@@ -48,6 +48,11 @@ export default function RootLayout() {
 
   return (
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <StatusBar
+            style={colorScheme === 'dark' ? 'light' : 'dark'}
+            backgroundColor={colorScheme === 'dark' ? "rgba(13, 27, 42, 1)" : "rgba(255, 255, 255, 1)"}
+            translucent={false}
+        />
         {session ? (
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -56,7 +61,6 @@ export default function RootLayout() {
         ) : (
             <Auth />
         )}
-        <StatusBar style="auto" />
       </ThemeProvider>
   );
 }
