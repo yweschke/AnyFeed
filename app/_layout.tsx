@@ -11,6 +11,8 @@ import { setupDatabase } from "@/services/database/rssFeeds";
 import { supabase } from "@/services/supabase/supabaseClient.ts"; // Import Supabase client
 import Auth from "@/app/auth/auth.tsx"; // Import auth screen
 import '@/services/i18n/config.ts';// Prevent the splash screen from auto-hiding before asset loading is complete.
+import { setupDatabase as setupFeedsDatabase } from "@/services/database/rssFeeds";
+import { setupDatabase as setupArticlesDatabase } from "@/services/database/rssArticles";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -39,7 +41,8 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    setupDatabase();
+    setupFeedsDatabase();
+    setupArticlesDatabase();
   }, []);
 
   if (!loaded) {

@@ -13,9 +13,6 @@ export default function TabLayout() {
     const iconColor = isDark ? "#8ca0b4" : "#50647f";
     const activeColor = isDark ? '#60a5fa' : '#0284c7';
 
-    console.log('isDark', isDark);
-    console.log(iconColor);
-
     return (
         <Tabs
             screenOptions={{

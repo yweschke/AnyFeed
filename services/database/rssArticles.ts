@@ -61,6 +61,9 @@ export const insertArticles = async (articles: Article[], feedId: Feed.id) => {
         for (const article of articles) {
             await insertArticle(article, feedId);
         }
+        console.log(`✅ Inserted ${articles.length} articles for feed ${feedId}`);
+    } catch (error) {
+        console.error('❌ Error batch inserting articles:', error);
     }
 }
 
