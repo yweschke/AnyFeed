@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
+import { View } from "react-native";
 import { fetchRSSFeed } from "@/services/rss-parser/fetchRSSFeed.ts";
 import { getFeeds } from "@/services/database/rssFeeds";
 import { Article } from "@/types/rssFeed/article.ts";
@@ -19,7 +19,7 @@ export default function HomeScreen() {
                     allArticles = [...allArticles, ...fetchedArticles];
                 }
 
-                setArticles(allArticles);
+                setArticles(allArticles );
             } catch (error) {
                 console.error("❌ Error fetching articles:", error);
             }
@@ -29,8 +29,8 @@ export default function HomeScreen() {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1 ">
+        <View className="flex-1 pt-safe">
             <ArticleList articles={articles} />
-        </SafeAreaView>
+        </View>
     );
 }

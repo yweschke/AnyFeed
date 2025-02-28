@@ -37,7 +37,7 @@ export default function TabLayout() {
                     shadowColor: isDark ? 'rgba(90, 110, 140, 1)' : 'rgba(50, 70, 100, 1)',
                     shadowOpacity: 0.2,
                     shadowOffset: { width: 0, height: 10 },
-                    shadowRadius: 10,
+                    shadowRadius: 5,
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',

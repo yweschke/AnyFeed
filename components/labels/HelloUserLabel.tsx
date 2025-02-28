@@ -46,7 +46,7 @@ export default function HelloUserLabel({ articles, headerHeight, unreadOpacity }
 
     return (
         <Animated.View
-            className="absolute top-0 left-0 right-0 bg-primary-light dark:bg-primary-dark  justify-center px-4"
+            className="absolute top-0 left-0 right-0 bg-primary-light dark:bg-primary-dark justify-center px-4"
             style={{ height: headerHeight, zIndex: 1000, elevation: 4 }}
         >
             <Text className="text-3xl font-bold text-textPrimary-light dark:text-textPrimary-dark pt-8">{greeting}</Text>

@@ -6,7 +6,7 @@ import ArticleCard from '@/components/cards/articleCard.tsx';
 
 export default function FeedCard({ articles }: { articles: Article[] }) {
     return (
-        <View className="bg-light-bg-secondary dark:bg-dark-bg-secondary shadow-xl shadow-light-accent dark:shadow-dark-accent p-2 rounded-lg w-9/10 justify-center items-center">
+        <View className="bg-secondary-light dark:bg-secondary-dark shadow shadow-accent-light dark:shadow-accent-dark p-2 rounded-lg m-3 justify-center items-center">
             {/* ✅ Render a big article only if at least one exists */}
             {articles.length > 0 && <ArticleBigCard article={articles[0]} />}
 

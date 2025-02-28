@@ -28,7 +28,7 @@ export default function ArticleList({ articles }: { articles: Article[] }) {
     const articleArray : Article[] = articles.slice(0, 4);
 
     return (
-        <View className="flex-1 bg-light-bg-primary dark:bg-dark-bg-primary ">
+        <View className="flex-1 bg-primary-light dark:bg-primary-dark ">
             {/* ✅ Pass scroll animations as props */}
             <HelloUserLabel
                 articles={articles}
@@ -43,7 +43,7 @@ export default function ArticleList({ articles }: { articles: Article[] }) {
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: false } // `false` because `height` can't be animated with `nativeDriver`
                 )}
-                className="bg-light-bg-primary dark:bg-dark-bg-primary m-2 rounded-2xl shadow-xl"
+                className="m-2 rounded-2xl"
             >
                 <View className="justify-center items-center w-full">
                     <FeedCard articles={articleArray} />
