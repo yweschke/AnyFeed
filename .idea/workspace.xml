@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/feedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/feedCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
-    </list>
+    <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -75,7 +67,7 @@
       <updated>1740742880555</updated>
       <workItem from="1740742881802" duration="164000" />
       <workItem from="1740760078367" duration="910000" />
-      <workItem from="1740761011666" duration="517000" />
+      <workItem from="1740761011666" duration="1431000" />
     </task>
     <servers />
   </component>

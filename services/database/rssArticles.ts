@@ -56,6 +56,14 @@ export const insertArticle = async (article: Article, feedId : Feed.id ) => {
     }
 }
 
+export const insertArticles = async (articles: Article[], feedId: Feed.id) => {
+    try {
+        for (const article of articles) {
+            await insertArticle(article, feedId);
+        }
+    }
+}
+
 export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
     try {
         const db = await openDatabase();
@@ -78,6 +86,32 @@ export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
         return [];
     }
 };
+
+export const getNewestArticles = async (feedId: Feed.id, limit: number): Promise<Article[]> => {
+    try {
+        const db = await openDatabase();
+        const rawArticles = await db.getAllAsync(
+            `SELECT * FROM rssArticles WHERE feed_id = ? ORDER BY published DESC LIMIT ?;`,
+            [feedId, limit]
+        );
+
+        return rawArticles.map((row: any) => ({
+            title: row.title,
+            url: row.url,
+            content: row.content,
+            description: row.description,
+            published: row.published ? new Date(row.published) : undefined,
+            updated: row.updated ? new Date(row.updated) : undefined,
+            authors: JSON.parse(row.authors || "[]"),       // Convert JSON to array
+            categories: JSON.parse(row.categories || "[]"), // Convert JSON to array
+            image: JSON.parse(row.images || "[]"),
+            unread: row.unread === 1 // Convert to boolean
+        }));
+    } catch (error) {
+        console.error('❌ Error fetching articles:', error);
+        return [];
+    }
+}
 
 export const getArticle = async (id: number): Promise<Article | null> => {
     try {
