@@ -1,12 +1,37 @@
-import React, { useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Animated, View } from 'react-native';
 import { Article } from '@/types/rssFeed/article';
 import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
 import ArticleCard from "@/components/cards/articleCard.tsx";
 import ArticleBigCard from "@/components/cards/articleBigCard.tsx";
 import FeedCard from "@/components/cards/feedCard.tsx";
+import {getFeeds} from "@/services/database/rssFeeds.ts";
+import {fetchRSSFeed} from "@/services/rss-parser/fetchRSSFeed.ts";
 
-export default function ArticleList({ articles }: { articles: Article[] }) {
+export default function ArticleList() {
+    const [articles, setArticles] = useState<Article[]>([]);
+
+    useEffect(() => {
+        const fetchAllArticles = async () => {
+            try {
+                const feeds = await getFeeds();
+                let allArticles: Article[] = [];
+
+                for (const feed of feeds) {
+                    const fetchedArticles = await fetchRSSFeed(feed.url);
+                    allArticles = [...allArticles, ...fetchedArticles];
+                }
+
+                setArticles(allArticles );
+            } catch (error) {
+                console.error("❌ Error fetching articles:", error);
+            }
+        };
+
+        fetchAllArticles();
+    }, []);
+
+    //Animation for HelloUserLabel
     const scrollY = useRef(new Animated.Value(0)).current;
 
     const HEADER_MAX_HEIGHT = 120;
