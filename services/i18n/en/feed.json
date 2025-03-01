@@ -1,7 +1,6 @@
 {
   "feed": {
     "articlesCount": "Articles: {{count}}",
-    "source": "Source",
     "noArticles": "No articles found for this feed",
     "loading": "Loading articles..."
   },

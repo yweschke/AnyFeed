@@ -1,73 +1,70 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, View, FlatList } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import { Animated, View, FlatList, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams, Stack } from 'expo-router';
 import { Article } from '@/types/rssFeed/article';
 import { Feed } from '@/types/rssFeed/feed';
-import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
-import FeedCard from "@/components/cards/feedCard.tsx";
-import { getFeeds } from "@/services/database/rssFeeds.ts";
-import { fetchRSSFeed } from "@/services/rss-parser/fetchRSSFeed.ts";
-import { insertArticles, getNewestArticles } from "@/services/database/rssArticles.ts";
+import { getFeeds } from '@/services/database/rssFeeds';
+import { getArticles } from '@/services/database/rssArticles';
+import ArticleCard from '@/components/cards/articleCard';
+import { ThemedText } from '@/components/ThemedText';
+import { useTranslation } from 'react-i18next';
+import ArticleListHeader from '@/components/headers/articleListHeader';
 
-interface FeedWithArticles {
-    feed: Feed;
-    articles: Article[];
-}
-
-export default function ArticleList() {
-    const [feedsWithArticles, setFeedsWithArticles] = useState<FeedWithArticles[]>([]);
-    const [allArticles, setAllArticles] = useState<Article[]>([]);
+export default function FeedDetailScreen() {
+    const { id } = useLocalSearchParams();
+    const feedId = typeof id === 'string' ? parseInt(id, 10) : 0;
+    const [feed, setFeed] = useState<Feed | null>(null);
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { t } = useTranslation('feed');
 
     useEffect(() => {
-        const fetchAndStoreArticles = async () => {
+        const loadFeedData = async () => {
             try {
+                // Load feed information
                 const feeds = await getFeeds();
-                let allFetchedArticles: Article[] = [];
-                const feedsWithArticlesArray: FeedWithArticles[] = [];
+                const currentFeed = feeds.find(f => f.id === feedId);
 
-                // Fetch, store and organize articles by feed
-                for (const feed of feeds) {
-                    // Fetch new articles
-                    const fetchedArticles = await fetchRSSFeed(feed.url);
+                if (currentFeed) {
+                    setFeed(currentFeed);
 
-                    // Skip to next feed if no articles were fetched
-                    if (!fetchedArticles || fetchedArticles.length === 0) {
-                        console.log(`No articles fetched for feed: ${feed.title}`);
-                        continue;
-                    }
-
-                    // Store in database
-                    await insertArticles(fetchedArticles, feed.id);
-                    console.log("Inserted Articles!");
-
-                    // Get newest articles for display
-                    const newestArticles = await getNewestArticles(feed.id, 4);
-
-                    // Skip if no articles are available to display
-                    if (newestArticles.length === 0) {
-                        continue;
-                    }
-
-                    // Add to our feed-articles mapping
-                    feedsWithArticlesArray.push({
-                        feed: feed,
-                        articles: newestArticles
-                    });
-
-                    // Add to all articles (for total count)
-                    allFetchedArticles = [...allFetchedArticles, ...newestArticles];
+                    // Load articles for this feed
+                    const feedArticles = await getArticles(feedId);
+                    setArticles(feedArticles);
                 }
-
-                setFeedsWithArticles(feedsWithArticlesArray);
-                setAllArticles(allFetchedArticles);
             } catch (error) {
-                console.error("❌ Error fetching and storing articles:", error);
+                console.error('Error loading feed details:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchAndStoreArticles();
-    }, []);
+        loadFeedData();
+    }, [feedId]);
 
-    // Animation for HelloUserLabel
+    const handleArticlePress = (article: Article) => {
+        // Navigate to article detail screen (we'll create this later)
+        // router.push(`/article/${articleId}`);
+        console.log('Article pressed:', article.title);
+    };
+
+    if (loading) {
+        return (
+            <View className="flex-1 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                <ActivityIndicator size="large" color="#60a5fa" />
+            </View>
+        );
+    }
+
+    if (!feed) {
+        return (
+            <View className="flex-1 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                <ThemedText>{t('error.feedNotFound', 'Feed not found')}</ThemedText>
+            </View>
+        );
+    }
+
+    // Animation for article list header
     const scrollY = useRef(new Animated.Value(0)).current;
 
     const HEADER_MAX_HEIGHT = 120;
@@ -88,25 +85,38 @@ export default function ArticleList() {
 
     return (
         <View className="flex-1 bg-primary-light dark:bg-primary-dark">
-            <HelloUserLabel
-                articles={allArticles}
-                headerHeight={headerHeight}
-                unreadOpacity={unreadOpacity}
+            <Stack.Screen
+                name="feed"
+                options={{
+                    headerShown: false,
+                }}
+            />
+
+            <ArticleListHeader
+            feed={feed}
+            unreadArticlesCount={1}
+            headerHeight={headerHeight}
+            unreadOpacity={unreadOpacity}
             />
 
             <Animated.FlatList
-                style={{ paddingTop: HEADER_MAX_HEIGHT}}
-                data={feedsWithArticles}
-                keyExtractor={(item) => item.feed.id.toString()}
+                data={articles}
+                keyExtractor={(item) => item.url}
                 renderItem={({ item }) => (
-                    <FeedCard articles={item.articles} feed={item.feed} />
+                    <ArticleCard
+                        article={item}
+                        onPress={() => handleArticlePress(item)}
+                    />
                 )}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: false }
                 )}
-                className="m-2 rounded-2xl pb-100"
-                ListFooterComponent={<View style={{ height: 100 }} />}
+                ListEmptyComponent={
+                    <View className="flex-1 justify-center items-center p-8">
+                        <ThemedText>{t('feed.noArticles', 'No articles found for this feed')}</ThemedText>
+                    </View>
+                }
             />
         </View>
     );
