@@ -1,0 +1,12 @@
+{
+  "feed": {
+    "articlesCount": "Articles: {{count}}",
+    "source": "Source",
+    "noArticles": "No articles found for this feed",
+    "loading": "Loading articles..."
+  },
+  "error": {
+    "feedNotFound": "Feed not found",
+    "loadingFailed": "Failed to load feed details"
+  }
+}

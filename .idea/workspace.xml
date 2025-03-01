@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/feed/[id].tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/headers/articleListHeader.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/i18n/en/feed.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/cards/feedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/feedCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/i18n/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/i18n/config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +83,7 @@
       <workItem from="1740859148948" duration="11000" />
       <workItem from="1740859191078" duration="98000" />
       <workItem from="1740859300497" duration="27000" />
+      <workItem from="1740859334031" duration="1305000" />
     </task>
     <servers />
   </component>
