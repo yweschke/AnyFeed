@@ -1,8 +1,9 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Article } from "@/types/rssFeed/article.ts";
-import {getTimeAgo} from "@/util/dateUtils.ts";
+import { useTimeAgo } from "@/hooks/useTimeAgo.ts";
 
 export default function ArticleCard({ article, onPress }: { article: Article; onPress: () => void }) {
+    const getTimeAgo = useTimeAgo();
     const timeAgo = getTimeAgo(article.published);
     return (
         <TouchableOpacity

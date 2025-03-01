@@ -2,7 +2,7 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import home from './en/home.json';
 import feed from './en/feed.json';
-import dateUtils from './en/dateUtils.json';
+import dateUtils from './en/date.json';
 
 export const defaultNS = 'home';
 
