@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cards/feedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/feedCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,23 +39,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "configurable.tailwindcss",
-    "ts.external.directory.path": "C:\\Users\\yanni\\WebstormProjects\\ParadiseRSS\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\yanni\\WebstormProjects\\ParadiseRSS\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -74,7 +73,13 @@
       <updated>1740742880555</updated>
       <workItem from="1740742881802" duration="164000" />
       <workItem from="1740760078367" duration="910000" />
-      <workItem from="1740761011666" duration="4531000" />
+      <workItem from="1740761011666" duration="8605000" />
+      <workItem from="1740858430184" duration="550000" />
+      <workItem from="1740859003466" duration="36000" />
+      <workItem from="1740859047215" duration="72000" />
+      <workItem from="1740859148948" duration="11000" />
+      <workItem from="1740859191078" duration="98000" />
+      <workItem from="1740859300497" duration="27000" />
     </task>
     <servers />
   </component>

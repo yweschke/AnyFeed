@@ -34,7 +34,7 @@ export const insertArticle = async (article: Article, feedId : Feed.id ) => {
         const db = await openDatabase();
 
         await db.runAsync(
-            `INSERT INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images)
+            `INSERT OR IGNORE INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 feedId,

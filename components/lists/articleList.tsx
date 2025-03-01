@@ -95,17 +95,18 @@ export default function ArticleList() {
             />
 
             <Animated.FlatList
-                style={{ paddingTop: HEADER_MAX_HEIGHT }}
+                style={{ paddingTop: HEADER_MAX_HEIGHT}}
                 data={feedsWithArticles}
                 keyExtractor={(item) => item.feed.id.toString()}
                 renderItem={({ item }) => (
-                    <FeedCard articles={item.articles} />
+                    <FeedCard articles={item.articles} feed={item.feed} />
                 )}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: false }
                 )}
-                className="m-2 rounded-2xl"
+                className="m-2 rounded-2xl pb-100"
+                ListFooterComponent={<View style={{ height: 100 }} />}
             />
         </View>
     );
