@@ -1,7 +1,10 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Article } from "@/types/rssFeed/article.ts";
+import {useTimeAgo} from "@/hooks/useTimeAgo.ts";
 
 export default function ArticleBigCard({ article, onPress }: { article: Article; onPress: () => void }) {
+    const getTimeAgo = useTimeAgo();
+    const timeAgo = getTimeAgo(article.published);
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -20,6 +23,9 @@ export default function ArticleBigCard({ article, onPress }: { article: Article;
                 </Text>
                 <Text className="text-textPrimary-light dark:text-textPrimary-dark opacity-80 mt-1" numberOfLines={3}>
                     {article.description}
+                </Text>
+                <Text className="text-textPrimary-light dark:text-textPrimary-dark opacity-80 text-sm mt-1" numberOfLines={1}>
+                    {timeAgo}
                 </Text>
             </View>
         </TouchableOpacity>

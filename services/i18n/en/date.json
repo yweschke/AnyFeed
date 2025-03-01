@@ -1,5 +1,4 @@
 {
-  "date": {
     "unknown": "Unknown date",
     "justNow": "Just now",
     "minuteAgo": "1 minute ago",
@@ -14,5 +13,4 @@
     "monthsAgo": "{{count}} months ago",
     "yearAgo": "1 year ago",
     "yearsAgo": "{{count}} years ago"
-  }
 }

@@ -1,8 +1,9 @@
+// services/i18n/config.ts
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import home from './en/home.json';
 import feed from './en/feed.json';
-import dateUtils from './en/date.json';
+import date from './en/date.json'; // Import as 'date'
 
 export const defaultNS = 'home';
 
@@ -14,12 +15,12 @@ if (!i18n.isInitialized) {
     i18n.init({
         lng: 'en',
         fallbackLng: 'en',
-        debug: false,
+        debug: true,
         resources: {
             en: {
                 home,
                 feed,
-                dateUtils,
+                date,
             },
         },
         defaultNS,
