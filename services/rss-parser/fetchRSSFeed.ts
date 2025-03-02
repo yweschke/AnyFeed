@@ -25,7 +25,8 @@ export const fetchRSSFeed = async (rssUrl: string): Promise<Article[]> => {
         return data.map((article: any) => ({
             ...article,
             published: article.published ? new Date(article.published) : undefined,
-            updated: article.updated ? new Date(article.updated) : undefined
+            updated: article.updated ? new Date(article.updated) : undefined,
+            unread : true,
         }));
     } catch (error) {
         console.error("❌ Error fetching RSS:", error);

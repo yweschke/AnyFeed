@@ -6,7 +6,7 @@ import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
 import FeedCard from "@/components/cards/feedCard.tsx";
 import { getFeeds } from "@/services/database/rssFeeds.ts";
 import { fetchRSSFeed } from "@/services/rss-parser/fetchRSSFeed.ts";
-import { insertArticles, getNewestArticles } from "@/services/database/rssArticles.ts";
+import { insertArticles, getNewestArticles, getUnreadArticlesNumber } from "@/services/database/rssArticles.ts";
 
 interface FeedWithArticles {
     feed: Feed;
@@ -15,7 +15,7 @@ interface FeedWithArticles {
 
 export default function FeedList() {
     const [feedsWithArticles, setFeedsWithArticles] = useState<FeedWithArticles[]>([]);
-    const [allArticles, setAllArticles] = useState<Article[]>([]);
+    const [unreadArticlesNumber, setUnreadArticlesNumber] = useState<number>(0);
 
     useEffect(() => {
         const fetchAndStoreArticles = async () => {
@@ -37,7 +37,6 @@ export default function FeedList() {
 
                     // Store in database
                     await insertArticles(fetchedArticles, feed.id);
-                    console.log("Inserted Articles!");
 
                     // Get newest articles for display
                     const newestArticles = await getNewestArticles(feed.id, 4);
@@ -52,13 +51,9 @@ export default function FeedList() {
                         feed: feed,
                         articles: newestArticles
                     });
-
-                    // Add to all articles (for total count)
-                    allFetchedArticles = [...allFetchedArticles, ...newestArticles];
                 }
 
                 setFeedsWithArticles(feedsWithArticlesArray);
-                setAllArticles(allFetchedArticles);
             } catch (error) {
                 console.error("❌ Error fetching and storing articles:", error);
             }
@@ -66,6 +61,19 @@ export default function FeedList() {
 
         fetchAndStoreArticles();
     }, []);
+
+    useEffect(() => {
+        const fetchUnreadArticles = async () => {
+            try {
+                const numberOfUnreadArticles = await getUnreadArticlesNumber();
+                setUnreadArticlesNumber(numberOfUnreadArticles);
+            } catch (error) {
+                console.error("❌ Error fetching unread articles:", error);
+            }
+        };
+
+        fetchUnreadArticles();
+    }, [feedsWithArticles]);
 
     // Animation for HelloUserLabel
     const scrollY = useRef(new Animated.Value(0)).current;
@@ -89,7 +97,7 @@ export default function FeedList() {
     return (
         <View className="flex-1 bg-primary-light dark:bg-primary-dark">
             <HelloUserLabel
-                articles={allArticles}
+                unreadArticlesNumber={unreadArticlesNumber}
                 headerHeight={headerHeight}
                 unreadOpacity={unreadOpacity}
             />

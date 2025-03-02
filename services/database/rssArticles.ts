@@ -29,13 +29,13 @@ export const setupDatabase = async () => {
     }
 };
 
-export const insertArticle = async (article: Article, feedId : Feed.id ) => {
+export const insertArticle = async (article: Article, feedId: Feed.id) => {
     try {
         const db = await openDatabase();
 
         await db.runAsync(
-            `INSERT OR IGNORE INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            `INSERT OR IGNORE INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images, unread)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 feedId,
                 article.title,
@@ -46,11 +46,12 @@ export const insertArticle = async (article: Article, feedId : Feed.id ) => {
                 article.updated?.toISOString() || null,
                 JSON.stringify(article.authors),      // Convert authors to JSON
                 JSON.stringify(article.categories),   // Convert categories to JSON
-                JSON.stringify(article.image)         // Convert images to JSON
+                JSON.stringify(article.image),        // Convert image to JSON
+                article.unread                              // Set unread to true
             ]
         );
 
-        console.log(`✅ Article '${article.title}' inserted successfully`);
+        //console.log(`✅ Article '${article.title}' inserted successfully, read: ${!article.unread}`);
     } catch (error) {
         console.error('❌ Error inserting article:', error);
     }
@@ -79,8 +80,8 @@ export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
             description: row.description,
             published: row.published ? new Date(row.published) : undefined,
             updated: row.updated ? new Date(row.updated) : undefined,
-            authors: JSON.parse(row.authors || "[]"),       // Convert JSON to array
-            categories: JSON.parse(row.categories || "[]"), // Convert JSON to array
+            authors: JSON.parse(row.authors || "[]"),
+            categories: JSON.parse(row.categories || "[]"),
             image: JSON.parse(row.images || "[]"),
             unread: row.unread === 1// Convert to boolan
         }));
@@ -143,6 +144,16 @@ export const getArticle = async (id: number): Promise<Article | null> => {
     }
 };
 
+export const getUnreadArticlesNumber = async () : Promise<number>=> {
+    try {
+        const db = await openDatabase();
+        const articles : Article[] = await db.getAllAsync(`SELECT * FROM rssArticles WHERE unread = 1;`);
+        return articles.length;
+    } catch (error) {
+        console.error('❌ Error fetching unread articles number:', error);
+        return 0;
+    }
+}
 
 export const updateArticle = async (id: number, article: Article) => {
     try {
@@ -233,3 +244,4 @@ export const deleteArticle = async (id: number) => {
         console.error('❌ Error deleting article:', error);
     }
 }
+

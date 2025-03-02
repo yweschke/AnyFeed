@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/i18n/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/i18n/config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/i18n/en/date.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/i18n/en/date.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/lists/feedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/feedList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +60,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-WS-243.24978.60" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
       </set>
     </attachedChunks>
   </component>
@@ -80,7 +81,8 @@
       <workItem from="1740859148948" duration="11000" />
       <workItem from="1740859191078" duration="98000" />
       <workItem from="1740859300497" duration="27000" />
-      <workItem from="1740859334031" duration="8490000" />
+      <workItem from="1740859334031" duration="9714000" />
+      <workItem from="1740946652867" duration="2442000" />
     </task>
     <servers />
   </component>
