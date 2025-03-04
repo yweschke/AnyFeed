@@ -1,6 +1,6 @@
 {
   "feed": {
-    "articlesCount": "Articles: {{count}}",
+    "articlesCount": "{{count}} unread Articles in this feed!",
     "noArticles": "No articles found for this feed",
     "loading": "Loading articles..."
   },

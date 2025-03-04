@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, FlatList, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { SafeAreaView } from 'react-native';
 import ArticleList from '@/components/lists/articleList.tsx'
 
 export default function FeedDetailScreen() {

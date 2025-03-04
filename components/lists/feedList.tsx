@@ -6,7 +6,7 @@ import HelloUserLabel from "@/components/labels/HelloUserLabel.tsx";
 import FeedCard from "@/components/cards/feedCard.tsx";
 import { getFeeds } from "@/services/database/rssFeeds.ts";
 import { fetchRSSFeed } from "@/services/rss-parser/fetchRSSFeed.ts";
-import { insertArticles, getNewestArticles, getUnreadArticlesNumber } from "@/services/database/rssArticles.ts";
+import { insertArticles, getNewestArticles, getUnreadArticlesNumber, deleteAllArticles } from "@/services/database/rssArticles.ts";
 
 interface FeedWithArticles {
     feed: Feed;
@@ -20,6 +20,7 @@ export default function FeedList() {
     useEffect(() => {
         const fetchAndStoreArticles = async () => {
             try {
+                await deleteAllArticles();
                 const feeds = await getFeeds();
                 let allFetchedArticles: Article[] = [];
                 const feedsWithArticlesArray: FeedWithArticles[] = [];

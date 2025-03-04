@@ -4,19 +4,39 @@ import { useLocalSearchParams, Stack } from 'expo-router';
 import { Article } from '@/types/rssFeed/article';
 import { Feed } from '@/types/rssFeed/feed';
 import { getFeeds } from '@/services/database/rssFeeds';
-import { getArticles } from '@/services/database/rssArticles';
+import {getArticles, getUnreadArticlesNumberFromFeed} from '@/services/database/rssArticles';
 import ArticleCard from '@/components/cards/articleCard';
 import { ThemedText } from '@/components/ThemedText';
 import { useTranslation } from 'react-i18next';
 import ArticleListHeader from '@/components/headers/articleListHeader';
 
-export default function FeedDetailScreen() {
+export default function ArticleList() {
     const { id } = useLocalSearchParams();
     const feedId = typeof id === 'string' ? parseInt(id, 10) : 0;
     const [feed, setFeed] = useState<Feed | null>(null);
     const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
+    const [unreadArticlesNumber, setUnreadArticlesNumber] = useState<number>(0);
     const { t } = useTranslation('feed');
+
+    // Animation for article list header
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    const HEADER_MAX_HEIGHT = 100;
+    const HEADER_MIN_HEIGHT = 60;
+    const SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+
+    const headerHeight = scrollY.interpolate({
+        inputRange: [0, SCROLL_DISTANCE],
+        outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+        extrapolate: "clamp",
+    });
+
+    const unreadOpacity = scrollY.interpolate({
+        inputRange: [0, SCROLL_DISTANCE / 2, SCROLL_DISTANCE],
+        outputRange: [1, 0.5, 0],
+        extrapolate: "clamp",
+    });
 
     useEffect(() => {
         const loadFeedData = async () => {
@@ -30,7 +50,11 @@ export default function FeedDetailScreen() {
 
                     // Load articles for this feed
                     const feedArticles = await getArticles(feedId);
-                    setArticles(feedArticles);
+                    const sortedArticles = feedArticles.sort((a, b) =>
+                        new Date(b.published).getTime() - new Date(a.published).getTime()
+                    );
+                    setArticles(sortedArticles);
+                    console.log("Getting articles from feed");
                 }
             } catch (error) {
                 console.error('Error loading feed details:', error);
@@ -41,6 +65,27 @@ export default function FeedDetailScreen() {
 
         loadFeedData();
     }, [feedId]);
+
+    useEffect(() => {
+        // Only run this effect if feed exists, is not null, and articles are loaded
+        if (feed?.id) {
+            const fetchUnreadArticles = async () => {
+                try {
+                    // Pass feedId instead of feed.id if that's what the function expects
+                    const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feed?.id);
+                    setUnreadArticlesNumber(numberOfUnreadArticles);
+                } catch (error) {
+                    console.error("❌ Error fetching unread articles:", error);
+                }
+            };
+
+            fetchUnreadArticles();
+        }
+    }, [articles]);
+
+    useEffect(() => {
+        console.log(feed?.id);
+    }, [articles]);
 
     const handleArticlePress = (article: Article) => {
         // Navigate to article detail screen (we'll create this later)
@@ -64,25 +109,6 @@ export default function FeedDetailScreen() {
         );
     }
 
-    // Animation for article list header
-    const scrollY = useRef(new Animated.Value(0)).current;
-
-    const HEADER_MAX_HEIGHT = 120;
-    const HEADER_MIN_HEIGHT = 60;
-    const SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
-
-    const headerHeight = scrollY.interpolate({
-        inputRange: [0, SCROLL_DISTANCE],
-        outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-        extrapolate: "clamp",
-    });
-
-    const unreadOpacity = scrollY.interpolate({
-        inputRange: [0, SCROLL_DISTANCE / 2, SCROLL_DISTANCE],
-        outputRange: [1, 0.5, 0],
-        extrapolate: "clamp",
-    });
-
     return (
         <View className="flex-1 bg-primary-light dark:bg-primary-dark">
             <Stack.Screen
@@ -93,15 +119,15 @@ export default function FeedDetailScreen() {
             />
 
             <ArticleListHeader
-            feed={feed}
-            unreadArticlesCount={1}
-            headerHeight={headerHeight}
-            unreadOpacity={unreadOpacity}
+                feed={feed}
+                unreadArticlesCount={unreadArticlesNumber}
+                headerHeight={headerHeight}
+                unreadOpacity={unreadOpacity}
             />
 
             <Animated.FlatList
                 data={articles}
-                keyExtractor={(item) => item.url}
+                keyExtractor={(item) => item.published.toString()}
                 renderItem={({ item }) => (
                     <ArticleCard
                         article={item}

@@ -155,6 +155,17 @@ export const getUnreadArticlesNumber = async (): Promise<number> => {
     }
 }
 
+export const getUnreadArticlesNumberFromFeed = async (feedId : Feed.id): Promise<number> => {
+    try {
+        const db = await openDatabase();
+        const articles= await db.getAllAsync(`SELECT * FROM rssArticles WHERE unread = 1 AND feed_id = ?;`, [feedId]);
+        return articles.length;
+    } catch (error) {
+        console.error('❌ Error fetching unread articles number:', error);
+        return 0;
+    }
+}
+
 export const updateArticle = async (id: number, article: Article): Promise<void> => {
     try {
         const db = await openDatabase();
@@ -242,5 +253,15 @@ export const deleteArticle = async (id: number): Promise<void> => {
         console.log('✅ Article deleted successfully');
     } catch (error) {
         console.error('❌ Error deleting article:', error);
+    }
+}
+
+export const deleteAllArticles = async (): Promise<void> => {
+    try {
+        const db = await openDatabase();
+        await db.runAsync(`DELETE FROM rssArticles;`);
+        console.log('✅ All articles deleted successfully');
+    } catch (error) {
+        console.error('❌ Error deleting all articles:', error);
     }
 }
