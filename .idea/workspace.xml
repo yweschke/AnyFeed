@@ -6,10 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/labels/HelloUserLabel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/lists/feedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/feedList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +79,7 @@
       <workItem from="1740859191078" duration="98000" />
       <workItem from="1740859300497" duration="27000" />
       <workItem from="1740859334031" duration="9714000" />
-      <workItem from="1740946652867" duration="2442000" />
+      <workItem from="1740946652867" duration="4130000" />
     </task>
     <servers />
   </component>

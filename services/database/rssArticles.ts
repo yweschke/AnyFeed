@@ -2,7 +2,7 @@ import { openDatabase} from './feeds.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { Feed } from '@/types/rssFeed/feed.ts';
 
-export const setupDatabase = async () => {
+export const setupDatabase = async (): Promise<void> => {
     try {
         const db = await openDatabase();
 
@@ -29,7 +29,7 @@ export const setupDatabase = async () => {
     }
 };
 
-export const insertArticle = async (article: Article, feedId: Feed.id) => {
+export const insertArticle = async (article: Article, feedId: Feed.id): Promise<void> => {
     try {
         const db = await openDatabase();
 
@@ -47,7 +47,7 @@ export const insertArticle = async (article: Article, feedId: Feed.id) => {
                 JSON.stringify(article.authors),      // Convert authors to JSON
                 JSON.stringify(article.categories),   // Convert categories to JSON
                 JSON.stringify(article.image),        // Convert image to JSON
-                article.unread                              // Set unread to true
+                article.unread                        // Set unread value
             ]
         );
 
@@ -57,7 +57,7 @@ export const insertArticle = async (article: Article, feedId: Feed.id) => {
     }
 }
 
-export const insertArticles = async (articles: Article[], feedId: Feed.id) => {
+export const insertArticles = async (articles: Article[], feedId: Feed.id): Promise<void> => {
     try {
         for (const article of articles) {
             await insertArticle(article, feedId);
@@ -83,7 +83,7 @@ export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
             authors: JSON.parse(row.authors || "[]"),
             categories: JSON.parse(row.categories || "[]"),
             image: JSON.parse(row.images || "[]"),
-            unread: row.unread === 1// Convert to boolan
+            unread: row.unread === 1 // Convert to boolean
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
@@ -144,10 +144,10 @@ export const getArticle = async (id: number): Promise<Article | null> => {
     }
 };
 
-export const getUnreadArticlesNumber = async () : Promise<number>=> {
+export const getUnreadArticlesNumber = async (): Promise<number> => {
     try {
         const db = await openDatabase();
-        const articles : Article[] = await db.getAllAsync(`SELECT * FROM rssArticles WHERE unread = 1;`);
+        const articles = await db.getAllAsync(`SELECT * FROM rssArticles WHERE unread = 1;`);
         return articles.length;
     } catch (error) {
         console.error('❌ Error fetching unread articles number:', error);
@@ -155,7 +155,7 @@ export const getUnreadArticlesNumber = async () : Promise<number>=> {
     }
 }
 
-export const updateArticle = async (id: number, article: Article) => {
+export const updateArticle = async (id: number, article: Article): Promise<void> => {
     try {
         const db = await openDatabase();
 
@@ -182,8 +182,8 @@ export const updateArticle = async (id: number, article: Article) => {
                 JSON.stringify(article.authors),      // Convert authors array to JSON string
                 JSON.stringify(article.categories),   // Convert categories array to JSON string
                 JSON.stringify(article.image),        // Convert images array to JSON string
-                id,
-                article.unread ? 1 : 0
+                article.unread ? 1 : 0,               // Convert boolean to SQLite integer
+                id
             ]
         );
 
@@ -193,7 +193,7 @@ export const updateArticle = async (id: number, article: Article) => {
     }
 };
 
-export const setToRead = async (id: number) => {
+export const setToRead = async (id: number): Promise<void> => {
     try {
         const db = await openDatabase();
 
@@ -204,7 +204,7 @@ export const setToRead = async (id: number) => {
     }
 }
 
-export const setToUnread = async (id: number) => {
+export const setToUnread = async (id: number): Promise<void> => {
     try {
         const db = await openDatabase();
 
@@ -215,7 +215,7 @@ export const setToUnread = async (id: number) => {
     }
 }
 
-export const deleteArticles = async (feedId: Feed.id) => {
+export const deleteArticles = async (feedId: Feed.id): Promise<void> => {
     try {
         const db = await openDatabase();
         await db.runAsync(`DELETE FROM rssArticles WHERE feed_id = ?;`, [feedId]);
@@ -225,17 +225,17 @@ export const deleteArticles = async (feedId: Feed.id) => {
     }
 }
 
-export const deleteOldArticles = async () => {
+export const deleteOldArticles = async (): Promise<void> => {
     try {
         const db = await openDatabase();
-        await db.runAsync(`DELETE FROM rssArticles WHERE date(isoDate) <= date('now', '-31 days');`);
+        await db.runAsync(`DELETE FROM rssArticles WHERE date(published) <= date('now', '-31 days');`);
         console.log("✅ Old articles deleted");
     } catch (error) {
         console.error("❌ Error deleting old articles:", error);
     }
 };
 
-export const deleteArticle = async (id: number) => {
+export const deleteArticle = async (id: number): Promise<void> => {
     try {
         const db = await openDatabase();
         await db.runAsync(`DELETE FROM rssArticles WHERE id = ?;`, [id]);
@@ -244,4 +244,3 @@ export const deleteArticle = async (id: number) => {
         console.error('❌ Error deleting article:', error);
     }
 }
-
