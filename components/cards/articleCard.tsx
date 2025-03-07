@@ -1,16 +1,26 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import { Article } from "@/types/rssFeed/article.ts";
 import { useTimeAgo } from "@/hooks/useTimeAgo.ts";
 
-export default function ArticleCard({ article, onPress }: { article: Article; onPress: () => void }) {
+export default function ArticleCard({ article, onPress }: { article: Article; onPress?: () => void }) {
     const getTimeAgo = useTimeAgo();
     const timeAgo = getTimeAgo(article.published);
+    const router = useRouter();
+
+    const handlePress = () => {
+        router.push(`/feed/9`);
+        if (onPress) {
+            onPress();
+        }
+    };
+
     return (
         <TouchableOpacity
-            onPress={onPress}
+            onPress={handlePress}
             className="bg-primary-light dark:bg-primary-dark shadow-sm shadow-accent-light dark:shadow-accent-dark m-2 rounded-2xl my-1 mx-2 p-2 flex-row items-center"
         >
-            <View className="flex-1  pr-2">
+            <View className="flex-1 pr-2">
                 <Text className="text-textPrimary-light dark:text-textPrimary-dark font-bold text" numberOfLines={2}>
                     {article.title}
                 </Text>

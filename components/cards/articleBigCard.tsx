@@ -5,9 +5,17 @@ import {useTimeAgo} from "@/hooks/useTimeAgo.ts";
 export default function ArticleBigCard({ article, onPress }: { article: Article; onPress: () => void }) {
     const getTimeAgo = useTimeAgo();
     const timeAgo = getTimeAgo(article.published);
+
+    const handlePress = () => {
+        router.push(`/feed/9`);
+        if (onPress) {
+            onPress();
+        }
+    };
+
     return (
         <TouchableOpacity
-            onPress={onPress}
+            onPress={handlePress}
             className="bg-primary-light dark:bg-primary-dark shadow-sm shadow-accent-light dark:shadow-accent-dark m-2 rounded-2xl w-100"
         >
             {/* Article Content */}

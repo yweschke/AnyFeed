@@ -127,7 +127,7 @@ export default function ArticleList() {
 
             <Animated.FlatList
                 data={articles}
-                keyExtractor={(item) => item.published.toString()}
+                keyExtractor={(item) => item.url.toString()}
                 renderItem={({ item }) => (
                     <ArticleCard
                         article={item}

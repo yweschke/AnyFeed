@@ -1,0 +1,17 @@
+{
+  "error": {
+    "articleNotFound": "Article not found",
+    "loadingFailed": "Failed to load article"
+  },
+  "actions": {
+    "goBack": "Go Back",
+    "back": "Back",
+    "share": "Share",
+    "openInBrowser": "Browser"
+  },
+  "labels": {
+    "author": "Author",
+    "published": "Published",
+    "categories": "Categories"
+  }
+}

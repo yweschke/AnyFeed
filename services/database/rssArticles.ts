@@ -117,10 +117,10 @@ export const getNewestArticles = async (feedId: Feed.id, limit: number): Promise
     }
 }
 
-export const getArticle = async (id: number): Promise<Article | null> => {
+export const getArticle = async (url: string): Promise<Article | null> => {
     try {
         const db = await openDatabase();
-        const rawArticle = await db.getAsync(`SELECT * FROM rssArticles WHERE id = ?;`, [id]);
+        const rawArticle = await db.getAsync(`SELECT * FROM rssArticles WHERE url = ?;`, [url]);
 
         if (!rawArticle) {
             return null;
@@ -198,28 +198,28 @@ export const updateArticle = async (id: number, article: Article): Promise<void>
             ]
         );
 
-        console.log(`✅ Article with ID ${id} updated successfully`);
+        console.log(`✅ Article with ID ${url} updated successfully`);
     } catch (error) {
         console.error('❌ Error updating article:', error);
     }
 };
 
-export const setToRead = async (id: number): Promise<void> => {
+export const setToRead = async (url: string): Promise<void> => {
     try {
         const db = await openDatabase();
 
-        await db.runAsync(`UPDATE rssArticles SET unread = 0 WHERE id = ?;`, [id]);
-        console.log(`✅ Article with ID ${id} marked as read`);
+        await db.runAsync(`UPDATE rssArticles SET unread = 0 WHERE url = ?;`, [url]);
+        console.log(`✅ Article with ID ${url} marked as read`);
     } catch (error) {
         console.error('❌ Error marking article as read:', error);
     }
 }
 
-export const setToUnread = async (id: number): Promise<void> => {
+export const setToUnread = async (url: string): Promise<void> => {
     try {
         const db = await openDatabase();
 
-        await db.runAsync(`UPDATE rssArticles SET unread = 1 WHERE id = ?;`, [id]);
+        await db.runAsync(`UPDATE rssArticles SET unread = 1 WHERE url = ?;`, [url]);
         console.log(`✅ Article with ID ${id} marked as unread`);
     } catch (error) {
         console.error('❌ Error marking article as unread:', error);
@@ -246,10 +246,10 @@ export const deleteOldArticles = async (): Promise<void> => {
     }
 };
 
-export const deleteArticle = async (id: number): Promise<void> => {
+export const deleteArticle = async (url: string): Promise<void> => {
     try {
         const db = await openDatabase();
-        await db.runAsync(`DELETE FROM rssArticles WHERE id = ?;`, [id]);
+        await db.runAsync(`DELETE FROM rssArticles WHERE url = ?;`, [url]);
         console.log('✅ Article deleted successfully');
     } catch (error) {
         console.error('❌ Error deleting article:', error);

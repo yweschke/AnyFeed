@@ -3,7 +3,8 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import home from './en/home.json';
 import feed from './en/feed.json';
-import date from './en/date.json'; // Import as 'date'
+import date from './en/date.json';
+import article from './en/article.json';
 
 export const defaultNS = 'home';
 
@@ -21,6 +22,7 @@ if (!i18n.isInitialized) {
                 home,
                 feed,
                 date,
+                article
             },
         },
         defaultNS,
