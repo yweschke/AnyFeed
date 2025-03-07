@@ -1,6 +1,6 @@
-// app/article/[url].tsx
+// app/article/[id].tsx
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, ActivityIndicator, TouchableOpacity, Share, StatusBar } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, Share, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
@@ -12,7 +12,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
 import { useColorScheme } from '@/hooks/useColorScheme.ts';
 
 export default function ArticleScreen() {
-    const { url } = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const articleId = typeof id === 'string' ? parseInt(id, 10) : 0;
     const [article, setArticle] = useState<Article | null>(null);
     const [loading, setLoading] = useState(true);
@@ -29,14 +29,19 @@ export default function ArticleScreen() {
     useEffect(() => {
         const loadArticle = async () => {
             try {
+                if (articleId <= 0) {
+                    setLoading(false);
+                    return;
+                }
+
                 const fetchedArticle = await getArticle(articleId);
 
                 if (fetchedArticle) {
                     setArticle(fetchedArticle);
 
                     // Mark article as read
-                    if (fetchedArticle.unread) {
-                        await setToRead(articleId);
+                    if (fetchedArticle.unread && fetchedArticle.id) {
+                        await setToRead(fetchedArticle.id);
                     }
                 }
             } catch (error) {

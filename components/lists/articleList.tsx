@@ -87,12 +87,6 @@ export default function ArticleList() {
         console.log(feed?.id);
     }, [articles]);
 
-    const handleArticlePress = (article: Article) => {
-        // Navigate to article detail screen (we'll create this later)
-        // router.push(`/article/${articleId}`);
-        console.log('Article pressed:', article.title);
-    };
-
     if (loading) {
         return (
             <View className="flex-1 justify-center items-center bg-primary-light dark:bg-primary-dark">

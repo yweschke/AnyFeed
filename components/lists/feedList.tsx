@@ -20,7 +20,6 @@ export default function FeedList() {
     useEffect(() => {
         const fetchAndStoreArticles = async () => {
             try {
-                await deleteAllArticles();
                 const feeds = await getFeeds();
                 let allFetchedArticles: Article[] = [];
                 const feedsWithArticlesArray: FeedWithArticles[] = [];

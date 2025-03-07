@@ -68,12 +68,13 @@ export const insertArticles = async (articles: Article[], feedId: Feed.id): Prom
     }
 }
 
-export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
+export const getArticles = async (feedId: number): Promise<Article[]> => {
     try {
         const db = await openDatabase();
         const rawArticles = await db.getAllAsync(`SELECT * FROM rssArticles WHERE feed_id = ?;`, [feedId]);
 
         return rawArticles.map((row: any) => ({
+            id: row.id,
             title: row.title,
             url: row.url,
             content: row.content,
@@ -82,16 +83,47 @@ export const getArticles = async (feedId: Feed.id): Promise<Article[]> => {
             updated: row.updated ? new Date(row.updated) : undefined,
             authors: JSON.parse(row.authors || "[]"),
             categories: JSON.parse(row.categories || "[]"),
-            image: JSON.parse(row.images || "[]"),
-            unread: row.unread === 1 // Convert to boolean
+            image: JSON.parse(row.images || "null"),
+            unread: row.unread === 1
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
         return [];
     }
+}
+
+export const getArticle = async (id: number): Promise<Article | null> => {
+    try {
+        const db = await openDatabase();
+        const result = await db.getAllAsync(`SELECT * FROM rssArticles WHERE id = ?;`, [id]);
+
+        if (!result || result.length === 0) {
+            console.log("No article found with ID:", id);
+            return null;
+        }
+
+        const rawArticle = result[0];
+
+        return {
+            id: rawArticle.id,
+            title: rawArticle.title,
+            url: rawArticle.url,
+            content: rawArticle.content,
+            description: rawArticle.description,
+            published: rawArticle.published ? new Date(rawArticle.published) : undefined,
+            updated: rawArticle.updated ? new Date(rawArticle.updated) : undefined,
+            authors: JSON.parse(rawArticle.authors || "[]"),
+            categories: JSON.parse(rawArticle.categories || "[]"),
+            image: JSON.parse(rawArticle.images || "null"),
+            unread: rawArticle.unread === 1
+        };
+    } catch (error) {
+        console.error("❌ Error fetching article by ID:", error);
+        return null;
+    }
 };
 
-export const getNewestArticles = async (feedId: Feed.id, limit: number): Promise<Article[]> => {
+export const getNewestArticles = async (feedId: number, limit: number): Promise<Article[]> => {
     try {
         const db = await openDatabase();
         const rawArticles = await db.getAllAsync(
@@ -100,49 +132,23 @@ export const getNewestArticles = async (feedId: Feed.id, limit: number): Promise
         );
 
         return rawArticles.map((row: any) => ({
+            id: row.id,
             title: row.title,
             url: row.url,
             content: row.content,
             description: row.description,
             published: row.published ? new Date(row.published) : undefined,
             updated: row.updated ? new Date(row.updated) : undefined,
-            authors: JSON.parse(row.authors || "[]"),       // Convert JSON to array
-            categories: JSON.parse(row.categories || "[]"), // Convert JSON to array
-            image: JSON.parse(row.images || "[]"),
-            unread: row.unread === 1 // Convert to boolean
+            authors: JSON.parse(row.authors || "[]"),
+            categories: JSON.parse(row.categories || "[]"),
+            image: JSON.parse(row.images || "null"),
+            unread: row.unread === 1
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
         return [];
     }
 }
-
-export const getArticle = async (url: string): Promise<Article | null> => {
-    try {
-        const db = await openDatabase();
-        const rawArticle = await db.getAsync(`SELECT * FROM rssArticles WHERE url = ?;`, [url]);
-
-        if (!rawArticle) {
-            return null;
-        }
-
-        return {
-            title: rawArticle.title,
-            url: rawArticle.url,
-            content: rawArticle.content,
-            description: rawArticle.description,
-            published: rawArticle.published ? new Date(rawArticle.published) : undefined,
-            updated: rawArticle.updated ? new Date(rawArticle.updated) : undefined,
-            authors: JSON.parse(rawArticle.authors || "[]"),       // Convert JSON to array
-            categories: JSON.parse(rawArticle.categories || "[]"), // Convert JSON to array
-            image: JSON.parse(rawArticle.images || "[]"),
-            unread: rawArticle.unread === 1 // Convert to boolean
-        };
-    } catch (error) {
-        console.error("❌ Error fetching article:", error);
-        return null;
-    }
-};
 
 export const getUnreadArticlesNumber = async (): Promise<number> => {
     try {
@@ -204,27 +210,25 @@ export const updateArticle = async (id: number, article: Article): Promise<void>
     }
 };
 
-export const setToRead = async (url: string): Promise<void> => {
+export const setToRead = async (id: number): Promise<void> => {
     try {
         const db = await openDatabase();
-
-        await db.runAsync(`UPDATE rssArticles SET unread = 0 WHERE url = ?;`, [url]);
-        console.log(`✅ Article with ID ${url} marked as read`);
+        await db.runAsync(`UPDATE rssArticles SET unread = 0 WHERE id = ?;`, [id]);
+        console.log(`✅ Article with ID ${id} marked as read`);
     } catch (error) {
         console.error('❌ Error marking article as read:', error);
     }
-}
+};
 
-export const setToUnread = async (url: string): Promise<void> => {
+export const setToUnread = async (id: number): Promise<void> => {
     try {
         const db = await openDatabase();
-
-        await db.runAsync(`UPDATE rssArticles SET unread = 1 WHERE url = ?;`, [url]);
+        await db.runAsync(`UPDATE rssArticles SET unread = 1 WHERE id = ?;`, [id]);
         console.log(`✅ Article with ID ${id} marked as unread`);
     } catch (error) {
         console.error('❌ Error marking article as unread:', error);
     }
-}
+};
 
 export const deleteArticles = async (feedId: Feed.id): Promise<void> => {
     try {

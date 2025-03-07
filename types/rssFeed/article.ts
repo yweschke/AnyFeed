@@ -1,4 +1,5 @@
 export interface Article {
+    id?: number;        // Add ID property
     authors: Author[];
     categories: Category[];
     content?: string;
@@ -10,7 +11,6 @@ export interface Article {
     url: string;
     unread: boolean;
 }
-
 export interface Author {
     name: string;
     email: string;

@@ -1,3 +1,4 @@
+// components/cards/articleCard.tsx
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Article } from "@/types/rssFeed/article.ts";
@@ -9,7 +10,13 @@ export default function ArticleCard({ article, onPress }: { article: Article; on
     const router = useRouter();
 
     const handlePress = () => {
-        router.push(`/feed/9`);
+        // Navigate to the article detail page using the article ID as the parameter
+        if (article.id) {
+            router.push(`/article/${article.id}`);
+        } else {
+            console.warn("Article has no ID, cannot navigate");
+        }
+
         if (onPress) {
             onPress();
         }
