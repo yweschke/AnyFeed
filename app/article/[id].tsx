@@ -77,11 +77,26 @@ export default function ArticleScreen() {
         }
     };
 
+
+
     // Create HTML content with appropriate styling based on theme
     const createHTMLContent = () => {
         if (!article) return '';
 
-        const htmlContent = article.content || article.description || '';
+        let content;
+        if(article.content === "No content available") {
+            if(article.description === "No description available") {
+                content = 'No content available';
+            } else {
+                content = `<img src="${article.image?.url}" width="250" height="188" align="left" />` + article.description;
+            }
+        } else {
+            content = article.content;
+        }
+
+
+
+        const htmlContent = content || '';
         const textColor = isDark ? '#ffffff' : '#000000';
         const linkColor = isDark ? '#60a5fa' : '#0284c7';
 
@@ -90,48 +105,61 @@ export default function ArticleScreen() {
             <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body {
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                        padding: 16px;
-                        color: ${textColor};
-                        background-color: transparent;
-                        line-height: 1.6;
-                        font-size: 18px;
-                    }
-                    img {
-                        max-width: 100%;
-                        height: auto;
-                        border-radius: 8px;
-                        margin: 8px 0;
-                    }
-                    a {
-                        color: ${linkColor};
-                        text-decoration: none;
-                    }
-                    h1, h2, h3, h4, h5, h6 {
-                        margin-top: 24px;
-                        margin-bottom: 16px;
-                    }
-                    blockquote {
-                        border-left: 4px solid ${linkColor};
-                        padding-left: 16px;
-                        margin-left: 0;
-                        opacity: 0.8;
-                    }
-                    pre {
-                        background-color: ${isDark ? '#1e293b' : '#f1f5f9'};
-                        padding: 16px;
-                        border-radius: 8px;
-                        overflow-x: auto;
-                    }
-                    code {
-                        font-family: monospace;
-                        background-color: ${isDark ? '#1e293b' : '#f1f5f9'};
-                        padding: 2px 4px;
-                        border-radius: 4px;
-                    }
-                </style>
+                     <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    padding: 16px;
+                    color: ${textColor};
+                    background-color: transparent;
+                    line-height: 1.6;
+                    font-size: 18px;
+                }
+                img {
+                    width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                    margin: 8px 0;
+                }
+                a {
+                    color: ${linkColor};
+                    text-decoration: none;
+                }
+                h1, h2, h3, h4, h5, h6 {
+                    margin-top: 24px;
+                    margin-bottom: 16px;
+                    line-height: 1.2; /* Added to fix multi-line heading spacing */
+                }
+                h1 {
+                    font-size: 24px;
+                    line-height: 1.2;
+                }
+                h2 {
+                    font-size: 22px;
+                    line-height: 1.2;
+                }
+                h3 {
+                    font-size: 20px;
+                    line-height: 1.2;
+                }
+                blockquote {
+                    border-left: 4px solid ${linkColor};
+                    padding-left: 16px;
+                    margin-left: 0;
+                    opacity: 0.8;
+                }
+                pre {
+                    background-color: ${isDark ? '#1e293b' : '#f1f5f9'};
+                    padding: 16px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                }
+                code {
+                    font-family: monospace;
+                    background-color: ${isDark ? '#1e293b' : '#f1f5f9'};
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+            </style>
             </head>
             <body>
                 <h1>${article.title || ''}</h1>
@@ -161,64 +189,79 @@ export default function ArticleScreen() {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-primary-light dark:bg-primary-dark" edges={['right', 'left']}>
-            <StatusBar
-                backgroundColor={backgroundColor}
-                barStyle={isDark ? 'light-content' : 'dark-content'}
+        <>
+            {/* Hide the default header */}
+            <Stack.Screen
+                options={{
+                    headerShown: false, // This will hide the header
+                    animation: 'slide_from_right' // Optional: customize the transition animation
+                }}
             />
 
-            {/* Top Navigation Bar */}
-            <View className="flex-row justify-between items-center px-4 py-2 bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
-                <TouchableOpacity onPress={handleBackPress} className="p-2">
-                    <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
-                </TouchableOpacity>
+            <SafeAreaView className="flex-1 bg-primary-light dark:bg-primary-dark" edges={['right', 'left']}>
+                <StatusBar
+                    backgroundColor={backgroundColor}
+                    barStyle={isDark ? 'light-content' : 'dark-content'}
+                />
 
-                <View className="flex-1 px-4">
-                    <ThemedText numberOfLines={1} className="text-center font-semibold">
-                        {article.title}
-                    </ThemedText>
+                {/* Custom Top Navigation Bar */}
+                <View className="flex-row justify-between items-center px-4 py-2 bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
+                    <TouchableOpacity onPress={handleBackPress} className="p-2">
+                        <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
+                    </TouchableOpacity>
+
+                    <View className="flex-1 px-4">
+                        <ThemedText numberOfLines={1} className="text-center font-semibold">
+                            {article.title}
+                        </ThemedText>
+                    </View>
+
+                    <TouchableOpacity onPress={handleSharePress} className="p-2">
+                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
+                    </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={handleSharePress} className="p-2">
-                    <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-                </TouchableOpacity>
-            </View>
+                {/* Content */}
+                <View className="flex-1">
+                    <WebView
+                        source={{ html: createHTMLContent() }}
+                        style={{ backgroundColor: 'transparent' }}
+                        originWhitelist={['*']}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        startInLoadingState={true}
+                        scalesPageToFit={false}
+                        renderLoading={() => (
+                            <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                                <ActivityIndicator size="large" color={activeColor} />
+                            </View>
+                        )}
+                    />
+                </View>
 
-            {/* Content */}
-            <View className="flex-1">
-                <WebView
-                    source={{ html: createHTMLContent() }}
-                    style={{ backgroundColor: 'transparent' }}
-                    originWhitelist={['*']}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    startInLoadingState={true}
-                    scalesPageToFit={false}
-                    renderLoading={() => (
-                        <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
-                            <ActivityIndicator size="large" color={activeColor} />
-                        </View>
-                    )}
-                />
-            </View>
+                {/* Bottom Navigation Bar */}
+                <View className="flex-row justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
+                    <TouchableOpacity onPress={handleSharePress} className="items-center">
+                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
+                        <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
+                    </TouchableOpacity>
 
-            {/* Bottom Navigation Bar */}
-            <View className="flex-row justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
-                <TouchableOpacity onPress={handleBackPress} className="items-center">
-                    <IconSymbol name="house.fill" size={24} color={iconColor} />
-                    <ThemedText className="text-xs mt-1">{t('actions.back', 'Back')}</ThemedText>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={handleBackPress} className="items-center">
+                        <IconSymbol name="house.fill" size={24} color={iconColor} />
+                        <ThemedText className="text-xs mt-1">{t('actions.back', 'Back')}</ThemedText>
+                    </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
-                    <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
-                    <ThemedText className="text-xs mt-1">{t('actions.openInBrowser', 'Browser')}</ThemedText>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
+                        <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
+                        <ThemedText className="text-xs mt-1">{t('actions.openInBrowser', 'Browser')}</ThemedText>
+                    </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleSharePress} className="items-center">
-                    <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-                    <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+                    <TouchableOpacity onPress={handleSharePress} className="items-center">
+                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
+                        <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        </>
     );
 }

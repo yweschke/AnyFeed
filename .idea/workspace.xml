@@ -6,13 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/article/[url].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/article/[id].tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/lists/feedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/feedList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/rssFeed/article.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/rssFeed/article.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/article/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/article/[id].tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,23 +37,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "terminal",
-    "ts.external.directory.path": "C:\\Users\\yanni\\WebstormProjects\\ParadiseRSS\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\yanni\\WebstormProjects\\ParadiseRSS\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\yanni\WebstormProjects\ParadiseRSS\app" />
@@ -92,7 +86,8 @@
       <workItem from="1740859334031" duration="9714000" />
       <workItem from="1740946652867" duration="4130000" />
       <workItem from="1741117188766" duration="7327000" />
-      <workItem from="1741365283479" duration="6490000" />
+      <workItem from="1741365283479" duration="9100000" />
+      <workItem from="1741635137821" duration="2977000" />
     </task>
     <servers />
   </component>
