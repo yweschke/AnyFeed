@@ -88,7 +88,7 @@ export default function ArticleScreen() {
             if(article.description === "No description available") {
                 content = 'No content available';
             } else {
-                content = `<img src="${article.image?.url}" width="250" height="188" align="left" />` + article.description;
+                content = `<img src="${article.image?.url}" alt="${article.image?.title}" width="250" height="188"/>` + article.description;
             }
         } else {
             content = article.content;
