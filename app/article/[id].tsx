@@ -71,13 +71,15 @@ export default function ArticleScreen() {
         }
     };
 
+    const handleTextPress = async () => {
+
+    }
+
     const handleOpenInBrowser = () => {
         if (article?.url) {
             router.push(article.url);
         }
     };
-
-
 
     // Create HTML content with appropriate styling based on theme
     const createHTMLContent = () => {
@@ -88,13 +90,14 @@ export default function ArticleScreen() {
             if(article.description === "No description available") {
                 content = 'No content available';
             } else {
-                content = `<img src="${article.image?.url}" alt="${article.image?.title}" width="250" height="188"/>` + article.description;
+                // Fixed image element to properly use the URL with a fallback if image doesn't exist
+                content = article.image?.url
+                    ? `<div style="text-align: center; margin-bottom: 20px;"> <img src="${article.image.url}" alt="${article.image?.title || 'Article image'}" style="width:100%; height:auto; float:left; margin-right:15px; margin-bottom:10px;"/> </div> <div>${article.description}</div>`
+                    : article.description;
             }
         } else {
             content = article.content;
         }
-
-
 
         const htmlContent = content || '';
         const textColor = isDark ? '#ffffff' : '#000000';
@@ -105,7 +108,7 @@ export default function ArticleScreen() {
             <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                     <style>
+                <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                     padding: 16px;
@@ -118,7 +121,8 @@ export default function ArticleScreen() {
                     width: 100%;
                     height: auto;
                     border-radius: 8px;
-                    margin: 8px 0;
+                    margin: 8px auto;
+                    display: block;
                 }
                 a {
                     color: ${linkColor};
@@ -159,7 +163,11 @@ export default function ArticleScreen() {
                     padding: 2px 4px;
                     border-radius: 4px;
                 }
-            </style>
+                .image-container {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                </style>
             </head>
             <body>
                 <h1>${article.title || ''}</h1>
@@ -190,24 +198,23 @@ export default function ArticleScreen() {
 
     return (
         <>
-            {/* Hide the default header */}
             <Stack.Screen
                 options={{
-                    headerShown: false, // This will hide the header
-                    animation: 'slide_from_right' // Optional: customize the transition animation
+                    headerShown: false,
+                    animation: 'slide_from_right'
                 }}
             />
 
-            <SafeAreaView className="flex-1 bg-primary-light dark:bg-primary-dark" edges={['right', 'left']}>
+            <SafeAreaView className="flex-1 bg-primary-light dark:bg-primary-dark" edges={['top', 'right', 'left']}>
                 <StatusBar
                     backgroundColor={backgroundColor}
                     barStyle={isDark ? 'light-content' : 'dark-content'}
                 />
 
                 {/* Custom Top Navigation Bar */}
-                <View className="flex-row justify-between items-center px-4 py-2 bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
+                <View className="flex-row justify-between items-center px-4 py-3 bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
                     <TouchableOpacity onPress={handleBackPress} className="p-2">
-                        <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
+                        <IconSymbol name="chevron.backward" size={24} color={iconColor} />
                     </TouchableOpacity>
 
                     <View className="flex-1 px-4">
@@ -216,7 +223,7 @@ export default function ArticleScreen() {
                         </ThemedText>
                     </View>
 
-                    <TouchableOpacity onPress={handleSharePress} className="p-2">
+                    <TouchableOpacity onPress={handleTextPress} className="p-2">
                         <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
                     </TouchableOpacity>
                 </View>
@@ -241,18 +248,13 @@ export default function ArticleScreen() {
 
                 {/* Bottom Navigation Bar */}
                 <View className="flex-row justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
-                    <TouchableOpacity onPress={handleSharePress} className="items-center">
-                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-                        <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
-                    </TouchableOpacity>
-
                     <TouchableOpacity onPress={handleBackPress} className="items-center">
-                        <IconSymbol name="house.fill" size={24} color={iconColor} />
+                        <IconSymbol name="bookmark" size={24} color={iconColor} />
                         <ThemedText className="text-xs mt-1">{t('actions.back', 'Back')}</ThemedText>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
-                        <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color={iconColor} />
+                        <IconSymbol name="globe.americas.fill" size={24} color={iconColor} />
                         <ThemedText className="text-xs mt-1">{t('actions.openInBrowser', 'Browser')}</ThemedText>
                     </TouchableOpacity>
 
