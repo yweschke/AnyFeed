@@ -26,6 +26,10 @@ module.exports = {
           light: "rgba(13, 27, 42, 0.5)",    // accent from first version (light)
           dark: "rgba(50, 70, 100, 0.5)",    // accent from first version (dark)
         },
+        active: {
+          light: "rgba(2, 132, 199, 1)",    // accent from first version (light)
+          dark: "rgba(96, 165, 250, 1)",    // accent from first version (dark)
+        },
       },
     },
   },

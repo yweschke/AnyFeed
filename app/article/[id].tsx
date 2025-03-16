@@ -4,12 +4,23 @@ import { View, ActivityIndicator, TouchableOpacity, Share, StatusBar } from 'rea
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText.tsx';
 import { getArticle, setToRead } from '@/services/database/rssArticles.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
 import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
 import { useColorScheme } from '@/hooks/useColorScheme.ts';
+import TextSettingsModal, { TextSettings } from '@/components/modals/TextSettingsModal';
+
+// Default text settings
+const DEFAULT_TEXT_SETTINGS: TextSettings = {
+    fontSize: 18,
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+};
+
+// Storage key for saved text settings
+const TEXT_SETTINGS_STORAGE_KEY = 'article_text_settings';
 
 export default function ArticleScreen() {
     const { id } = useLocalSearchParams();
@@ -21,10 +32,30 @@ export default function ArticleScreen() {
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
 
+    // Text settings state
+    const [textSettings, setTextSettings] = useState<TextSettings>(DEFAULT_TEXT_SETTINGS);
+    const [textSettingsModalVisible, setTextSettingsModalVisible] = useState(false);
+
     // Colors
     const iconColor = isDark ? "#8ca0b4" : "#50647f";
     const activeColor = isDark ? '#60a5fa' : '#0284c7';
     const backgroundColor = isDark ? 'rgba(13, 27, 42, 1)' : 'rgba(255, 255, 255, 1)';
+
+    useEffect(() => {
+        // Load saved text settings
+        const loadTextSettings = async () => {
+            try {
+                const savedSettings = await AsyncStorage.getItem(TEXT_SETTINGS_STORAGE_KEY);
+                if (savedSettings) {
+                    setTextSettings(JSON.parse(savedSettings));
+                }
+            } catch (error) {
+                console.error('Error loading text settings:', error);
+            }
+        };
+
+        loadTextSettings();
+    }, []);
 
     useEffect(() => {
         const loadArticle = async () => {
@@ -71,9 +102,9 @@ export default function ArticleScreen() {
         }
     };
 
-    const handleTextPress = async () => {
-
-    }
+    const handleTextPress = () => {
+        setTextSettingsModalVisible(true);
+    };
 
     const handleOpenInBrowser = () => {
         if (article?.url) {
@@ -81,7 +112,17 @@ export default function ArticleScreen() {
         }
     };
 
-    // Create HTML content with appropriate styling based on theme
+    const handleSaveTextSettings = async (newSettings: TextSettings) => {
+        setTextSettings(newSettings);
+
+        try {
+            await AsyncStorage.setItem(TEXT_SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
+        } catch (error) {
+            console.error('Error saving text settings:', error);
+        }
+    };
+
+    // Create HTML content with appropriate styling based on theme and text settings
     const createHTMLContent = () => {
         if (!article) return '';
 
@@ -110,12 +151,12 @@ export default function ArticleScreen() {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    font-family: ${textSettings.fontFamily};
                     padding: 16px;
                     color: ${textColor};
                     background-color: transparent;
                     line-height: 1.6;
-                    font-size: 18px;
+                    font-size: ${textSettings.fontSize}px;
                 }
                 img {
                     width: 100%;
@@ -132,17 +173,18 @@ export default function ArticleScreen() {
                     margin-top: 24px;
                     margin-bottom: 16px;
                     line-height: 1.2; /* Added to fix multi-line heading spacing */
+                    font-family: ${textSettings.fontFamily};
                 }
                 h1 {
-                    font-size: 24px;
+                    font-size: ${textSettings.fontSize + 6}px;
                     line-height: 1.2;
                 }
                 h2 {
-                    font-size: 22px;
+                    font-size: ${textSettings.fontSize + 4}px;
                     line-height: 1.2;
                 }
                 h3 {
-                    font-size: 20px;
+                    font-size: ${textSettings.fontSize + 2}px;
                     line-height: 1.2;
                 }
                 blockquote {
@@ -253,6 +295,11 @@ export default function ArticleScreen() {
                         <ThemedText className="text-xs mt-1">{t('actions.back', 'Back')}</ThemedText>
                     </TouchableOpacity>
 
+                    <TouchableOpacity onPress={handleTextPress} className="items-center">
+                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
+                        <ThemedText className="text-xs mt-1">{t('actions.textSettings', 'Text')}</ThemedText>
+                    </TouchableOpacity>
+
                     <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
                         <IconSymbol name="globe.americas.fill" size={24} color={iconColor} />
                         <ThemedText className="text-xs mt-1">{t('actions.openInBrowser', 'Browser')}</ThemedText>
@@ -263,6 +310,14 @@ export default function ArticleScreen() {
                         <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
                     </TouchableOpacity>
                 </View>
+
+                {/* Text Settings Modal */}
+                <TextSettingsModal
+                    visible={textSettingsModalVisible}
+                    onClose={() => setTextSettingsModalVisible(false)}
+                    initialSettings={textSettings}
+                    onSave={handleSaveTextSettings}
+                />
             </SafeAreaView>
         </>
     );

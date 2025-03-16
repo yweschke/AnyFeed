@@ -7,11 +7,20 @@
     "goBack": "Go Back",
     "back": "Back",
     "share": "Share",
-    "openInBrowser": "Browser"
+    "openInBrowser": "Browser",
+    "textSettings": "Text"
   },
   "labels": {
     "author": "Author",
     "published": "Published",
     "categories": "Categories"
+  },
+  "textSettings": {
+    "title": "Text Settings",
+    "fontSize": "Font Size",
+    "fontFamily": "Font Family",
+    "sampleText": "Sample Text",
+    "apply": "Apply Changes",
+    "cancel": "Cancel"
   }
 }
