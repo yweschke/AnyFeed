@@ -1,17 +1,20 @@
 // app/article/[id].tsx
-import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, TouchableOpacity, Share, StatusBar } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, ActivityIndicator, TouchableOpacity, Share, StatusBar, FlatList, Dimensions, Animated } from 'react-native';
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText.tsx';
-import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread } from '@/services/database/rssArticles.ts';
+import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread, getArticles } from '@/services/database/rssArticles.ts';
+import { openDatabase } from '@/services/database/feeds.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
 import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
 import { useColorScheme } from '@/hooks/useColorScheme.ts';
 import TextSettingsModal, { TextSettings } from '@/components/modals/TextSettingsModal';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Default text settings
 const DEFAULT_TEXT_SETTINGS: TextSettings = {
@@ -22,16 +25,21 @@ const DEFAULT_TEXT_SETTINGS: TextSettings = {
 // Storage key for saved text settings
 const TEXT_SETTINGS_STORAGE_KEY = 'article_text_settings';
 
+// Get screen width for FlatList
+const { width } = Dimensions.get('window');
+
 export default function ArticleScreen() {
     const { id } = useLocalSearchParams();
-    const articleId = typeof id === 'string' ? parseInt(id, 10) : 0;
-    const [article, setArticle] = useState<Article | null>(null);
+    const initialArticleId = typeof id === 'string' ? parseInt(id, 10) : 0;
+    const [currentArticleIndex, setCurrentArticleIndex] = useState(0);
+    const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
     const [viewOriginalWebsite, setViewOriginalWebsite] = useState(false);
     const router = useRouter();
     const { t } = useTranslation('article');
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const flatListRef = useRef(null); // Changed type to allow AnimatedFlatList
 
     // Text settings state
     const [textSettings, setTextSettings] = useState<TextSettings>(DEFAULT_TEXT_SETTINGS);
@@ -41,6 +49,10 @@ export default function ArticleScreen() {
     const iconColor = isDark ? "#8ca0b4" : "#50647f";
     const activeColor = isDark ? '#60a5fa' : '#0284c7';
     const backgroundColor = isDark ? 'rgba(13, 27, 42, 1)' : 'rgba(255, 255, 255, 1)';
+    const inactiveColor = isDark ? 'rgba(75, 85, 99, 0.5)' : 'rgba(156, 163, 175, 0.5)';
+
+    // Animation for pagination dots
+    const scrollX = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         // Load saved text settings
@@ -59,38 +71,87 @@ export default function ArticleScreen() {
     }, []);
 
     useEffect(() => {
-        const loadArticle = async () => {
+        const loadArticlesFromFeed = async () => {
             try {
-                if (articleId <= 0) {
+                if (initialArticleId <= 0) {
                     setLoading(false);
                     return;
                 }
 
-                const fetchedArticle = await getArticle(articleId);
+                // First, get the current article to determine its feed
+                const currentArticle = await getArticle(initialArticleId);
 
-                if (fetchedArticle) {
-                    setArticle(fetchedArticle);
+                if (!currentArticle || !currentArticle.id) {
+                    setLoading(false);
+                    return;
+                }
 
-                    // Mark article as read
-                    if (fetchedArticle.unread && fetchedArticle.id) {
-                        await setToRead(fetchedArticle.id);
+                // gettin feed id
+                const db = await openDatabase();
+                const result = await db.getAllAsync(`SELECT feed_id FROM rssArticles WHERE id = ?;`, [initialArticleId]);
+
+                if (!result || result.length === 0) {
+                    console.error('Could not find feed_id for article:', initialArticleId);
+                    setLoading(false);
+                    return;
+                }
+
+                const feedId = result[0].feed_id;
+                console.log('Loading articles from feed ID:', feedId);
+
+                // Get all articles from the same feed
+                const feedArticles = await getArticles(feedId);
+                console.log('Loaded articles count:', feedArticles.length);
+
+                // Sort articles by date (newest first)
+                const sortedArticles = feedArticles.sort((a, b) =>
+                    new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime()
+                );
+
+                setArticles(sortedArticles);
+
+                // Find the index of the current article
+                const index = sortedArticles.findIndex(article => article.id === initialArticleId);
+                if (index !== -1) {
+                    setCurrentArticleIndex(index);
+
+                    // Mark the current article as read
+                    if (sortedArticles[index].unread && sortedArticles[index].id) {
+                        await setToRead(sortedArticles[index].id);
+
+                        // Update the articles array with the read status
+                        const updatedArticles = [...sortedArticles];
+                        updatedArticles[index] = { ...updatedArticles[index], unread: false };
+                        setArticles(updatedArticles);
                     }
                 }
             } catch (error) {
-                console.error('Error loading article:', error);
+                console.error('Error loading articles:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadArticle();
-    }, [articleId]);
+        loadArticlesFromFeed();
+    }, [initialArticleId]);
+
+    // Scroll to the current article when the index changes
+    useEffect(() => {
+        if (flatListRef.current && articles.length > 0) {
+            flatListRef.current.scrollToIndex({
+                index: currentArticleIndex,
+                animated: false,
+                viewPosition: 0
+            });
+        }
+    }, [currentArticleIndex, articles.length]);
 
     const handleBackPress = () => {
         router.back();
     };
 
     const handleSharePress = async () => {
+        const article = articles[currentArticleIndex];
         if (article) {
             try {
                 await Share.share({
@@ -108,15 +169,23 @@ export default function ArticleScreen() {
     };
 
     const handleUnreadPress = async () => {
+        if (articles.length === 0 || currentArticleIndex >= articles.length) return;
+
+        const article = articles[currentArticleIndex];
+
         try {
             if (article?.id) {
+                const updatedArticles = [...articles];
+
                 if (article.unread) {
                     await setToRead(article.id);
-                    setArticle({...article, unread: false});
+                    updatedArticles[currentArticleIndex].unread = false;
                 } else {
                     await setToUnread(article.id);
-                    setArticle({...article, unread: true});
+                    updatedArticles[currentArticleIndex].unread = true;
                 }
+
+                setArticles(updatedArticles);
             }
         } catch (error) {
             console.error('Error updating unread status:', error);
@@ -137,23 +206,50 @@ export default function ArticleScreen() {
     };
 
     const handleSafeForLaterPress = async () => {
+        if (articles.length === 0 || currentArticleIndex >= articles.length) return;
+
+        const article = articles[currentArticleIndex];
+
         try {
             if (article?.id) {
+                const updatedArticles = [...articles];
+
                 if (!article.safedForLater) {
                     await setToSafedForLater(article.id);
-                    setArticle({...article, safedForLater: true});
+                    updatedArticles[currentArticleIndex].safedForLater = true;
                 } else {
                     await setToNotSafedForLater(article.id);
-                    setArticle({...article, safedForLater: false});
+                    updatedArticles[currentArticleIndex].safedForLater = false;
                 }
+
+                setArticles(updatedArticles);
             }
         } catch (error) {
             console.error('Error updating saved for later status:', error);
         }
     };
 
+    // Handle FlatList scroll event to mark articles as read when they come into view
+    const handleViewableItemsChanged = async ({ viewableItems }) => {
+        if (viewableItems.length > 0) {
+            const viewedArticleIndex = viewableItems[0].index;
+            setCurrentArticleIndex(viewedArticleIndex);
+
+            // Mark article as read when it comes into view
+            const article = articles[viewedArticleIndex];
+            if (article && article.id && article.unread) {
+                await setToRead(article.id);
+
+                // Update the articles array with the read status
+                const updatedArticles = [...articles];
+                updatedArticles[viewedArticleIndex] = { ...updatedArticles[viewedArticleIndex], unread: false };
+                setArticles(updatedArticles);
+            }
+        }
+    };
+
     // Create HTML content with appropriate styling based on theme and text settings
-    const createHTMLContent = () => {
+    const createHTMLContent = (article: Article) => {
         if (!article) return '';
 
         let content;
@@ -249,6 +345,114 @@ export default function ArticleScreen() {
         `;
     };
 
+    // Render individual article item
+    const renderArticleItem = ({ item }) => {
+        return (
+            <View style={{ width }}>
+                {viewOriginalWebsite && item.url ? (
+                    <WebView
+                        source={{ uri: item.url }}
+                        style={{ flex: 1, backgroundColor: 'transparent' }}
+                        startInLoadingState={true}
+                        renderLoading={() => (
+                            <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                                <ActivityIndicator size="large" color={activeColor} />
+                            </View>
+                        )}
+                    />
+                ) : (
+                    <WebView
+                        source={{ html: createHTMLContent(item) }}
+                        style={{ flex: 1, backgroundColor: 'transparent' }}
+                        originWhitelist={['*']}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        startInLoadingState={true}
+                        scalesPageToFit={false}
+                        renderLoading={() => (
+                            <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                                <ActivityIndicator size="large" color={activeColor} />
+                            </View>
+                        )}
+                    />
+                )}
+            </View>
+        );
+    };
+
+    // Create pagination dots
+    const renderPaginationDots = () => {
+        if (articles.length <= 1) return null;
+
+        const maxDots = 5; // Maximum number of dots to show
+        let startDot = 0;
+        let endDot = articles.length;
+
+        // If we have more than maxDots articles, adjust which range to show
+        if (articles.length > maxDots) {
+            // Calculate the range to show around the current article
+            const visibleRadius = Math.floor(maxDots / 2);
+            startDot = Math.max(0, currentArticleIndex - visibleRadius);
+            endDot = Math.min(articles.length, startDot + maxDots);
+
+            // Adjust if we're close to the end
+            if (endDot === articles.length) {
+                startDot = Math.max(0, endDot - maxDots);
+            }
+        }
+
+        return (
+            <View className="flex-row justify-center items-center mx-4">
+                {currentArticleIndex > 0 && (
+                    <TouchableOpacity
+                        onPress={() => setCurrentArticleIndex(Math.max(0, currentArticleIndex - 1))}
+                        className="px-1"
+                    >
+                        <IconSymbol name="chevron.left" size={16} color={iconColor} />
+                    </TouchableOpacity>
+                )}
+
+                {startDot > 0 && (
+                    <View className="px-1">
+                        <ThemedText>...</ThemedText>
+                    </View>
+                )}
+
+                {Array.from({ length: endDot - startDot }, (_, i) => i + startDot).map((index) => (
+                    <TouchableOpacity
+                        key={`dot-${index}`}
+                        onPress={() => setCurrentArticleIndex(index)}
+                        className="px-1"
+                    >
+                        <View
+                            className="h-2 w-2 rounded-full mx-1"
+                            style={{
+                                backgroundColor: index === currentArticleIndex
+                                    ? activeColor
+                                    : inactiveColor
+                            }}
+                        />
+                    </TouchableOpacity>
+                ))}
+
+                {endDot < articles.length && (
+                    <View className="px-1">
+                        <ThemedText>...</ThemedText>
+                    </View>
+                )}
+
+                {currentArticleIndex < articles.length - 1 && (
+                    <TouchableOpacity
+                        onPress={() => setCurrentArticleIndex(Math.min(articles.length - 1, currentArticleIndex + 1))}
+                        className="px-1"
+                    >
+                        <IconSymbol name="chevron.right" size={16} color={iconColor} />
+                    </TouchableOpacity>
+                )}
+            </View>
+        );
+    };
+
     if (loading) {
         return (
             <View className="flex-1 justify-center items-center bg-primary-light dark:bg-primary-dark">
@@ -257,7 +461,7 @@ export default function ArticleScreen() {
         );
     }
 
-    if (!article) {
+    if (articles.length === 0) {
         return (
             <View className="flex-1 justify-center items-center bg-primary-light dark:bg-primary-dark">
                 <ThemedText>{t('error.articleNotFound', 'Article not found')}</ThemedText>
@@ -268,8 +472,10 @@ export default function ArticleScreen() {
         );
     }
 
+    const currentArticle = articles[currentArticleIndex];
+
     return (
-        <>
+        <GestureHandlerRootView style={{ flex: 1 }}>
             <Stack.Screen
                 options={{
                     headerShown: false,
@@ -284,68 +490,71 @@ export default function ArticleScreen() {
                 />
 
                 {/* Custom Top Navigation Bar */}
-                <View className="flex-row justify-between items-center px-4 py-3 bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
-                    <TouchableOpacity onPress={handleBackPress} className="p-2">
-                        <IconSymbol name="chevron.backward" size={24} color={iconColor} />
-                    </TouchableOpacity>
+                <View className="bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
+                    <View className="flex-row justify-between items-center px-4 py-3">
+                        <TouchableOpacity onPress={handleBackPress} className="p-2">
+                            <IconSymbol name="chevron.backward" size={24} color={iconColor} />
+                        </TouchableOpacity>
 
-                    <View className="flex-1 px-4">
-                        <ThemedText numberOfLines={1} className="text-center font-semibold">
-                            {article.title}
-                        </ThemedText>
+                        <View className="flex-1 px-4">
+                            <ThemedText numberOfLines={1} className="text-center font-semibold">
+                                {currentArticle.title}
+                            </ThemedText>
+                        </View>
+
+                        <TouchableOpacity onPress={handleTextPress} className="p-2">
+                            <IconSymbol name="textformat.size" size={24} color={iconColor} />
+                        </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity onPress={handleTextPress} className="p-2">
-                        <IconSymbol name="textformat.size" size={24} color={iconColor} />
-                    </TouchableOpacity>
+                    {/* Pagination Dots */}
+                    <View className="py-2">
+                        {renderPaginationDots()}
+                    </View>
                 </View>
 
                 {/* Content */}
                 <View className="flex-1">
-                    {viewOriginalWebsite && article.url ? (
-                        <WebView
-                            source={{ uri: article.url }}
-                            style={{ backgroundColor: 'transparent' }}
-                            startInLoadingState={true}
-                            renderLoading={() => (
-                                <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
-                                    <ActivityIndicator size="large" color={activeColor} />
-                                </View>
-                            )}
-                        />
-                    ) : (
-                        <WebView
-                            source={{ html: createHTMLContent() }}
-                            style={{ backgroundColor: 'transparent' }}
-                            originWhitelist={['*']}
-                            javaScriptEnabled={true}
-                            domStorageEnabled={true}
-                            startInLoadingState={true}
-                            scalesPageToFit={false}
-                            renderLoading={() => (
-                                <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
-                                    <ActivityIndicator size="large" color={activeColor} />
-                                </View>
-                            )}
-                        />
-                    )}
+                    <AnimatedFlatList
+                        ref={flatListRef}
+                        data={articles}
+                        renderItem={renderArticleItem}
+                        keyExtractor={(item) => item.id?.toString()}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        initialScrollIndex={currentArticleIndex}
+                        getItemLayout={(data, index) => ({
+                            length: width,
+                            offset: width * index,
+                            index,
+                        })}
+                        onViewableItemsChanged={handleViewableItemsChanged}
+                        viewabilityConfig={{
+                            itemVisiblePercentThreshold: 50
+                        }}
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                            { useNativeDriver: true }
+                        )}
+                    />
                 </View>
 
                 {/* Bottom Navigation Bar */}
                 <View className="flex-row p-10 pb-safe justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
                     <TouchableOpacity onPress={handleSafeForLaterPress} className="items-center">
                         <IconSymbol
-                            name={article.safedForLater ? "bookmark.fill" : "bookmark"}
+                            name={currentArticle.safedForLater ? "bookmark.fill" : "bookmark"}
                             size={28}
-                            color={article.safedForLater ? activeColor : iconColor}
+                            color={currentArticle.safedForLater ? activeColor : iconColor}
                         />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleUnreadPress} className="items-center">
                         <IconSymbol
-                            name={article.unread ? "envelope" : "envelope.open"}
+                            name={currentArticle.unread ? "envelope" : "envelope.open"}
                             size={28}
-                            color={article.unread ? activeColor : iconColor}
+                            color={currentArticle.unread ? activeColor : iconColor}
                         />
                     </TouchableOpacity>
 
@@ -374,6 +583,6 @@ export default function ArticleScreen() {
                     onSave={handleSaveTextSettings}
                 />
             </SafeAreaView>
-        </>
+        </GestureHandlerRootView>
     );
 }
