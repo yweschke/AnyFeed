@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText.tsx';
-import { getArticle, setToRead } from '@/services/database/rssArticles.ts';
+import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater } from '@/services/database/rssArticles.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
 import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
@@ -106,6 +106,21 @@ export default function ArticleScreen() {
         setTextSettingsModalVisible(true);
     };
 
+    const handleUnreadPress = async () => {
+        try {
+            if(article?.unread) {
+                await setToRead(article.id);
+                article.unread = false;
+            } else {
+                await setToNotRead(article.id);
+                article.unread = true;
+            }
+        } catch (error) {
+            console.error('Error updating unread status:', error);
+        }
+
+    }
+
     const handleOpenInBrowser = () => {
         if (article?.url) {
             router.push(article.url);
@@ -114,13 +129,28 @@ export default function ArticleScreen() {
 
     const handleSaveTextSettings = async (newSettings: TextSettings) => {
         setTextSettings(newSettings);
-
         try {
             await AsyncStorage.setItem(TEXT_SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
         } catch (error) {
             console.error('Error saving text settings:', error);
         }
     };
+
+    const handleSafeForLaterPress = async () => {
+        try {
+            if (article) {
+                if (!article.safedForLater) {
+                    await setToSafedForLater(article.id);
+                    article.safedForLater = true;
+                } else {
+                    await setToNotSafedForLater(article.id);
+                    article.safedForLater = false;
+                }
+            }
+        } catch (error) {
+            console.error('Error saving text settings:', error);
+        }
+    }
 
     // Create HTML content with appropriate styling based on theme and text settings
     const createHTMLContent = () => {
@@ -289,25 +319,21 @@ export default function ArticleScreen() {
                 </View>
 
                 {/* Bottom Navigation Bar */}
-                <View className="flex-row justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
-                    <TouchableOpacity onPress={handleBackPress} className="items-center">
-                        <IconSymbol name="bookmark" size={24} color={iconColor} />
-                        <ThemedText className="text-xs mt-1">{t('actions.back', 'Back')}</ThemedText>
+                <View className="flex-row p-10 pb-safe justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
+                    <TouchableOpacity onPress={handleSafeForLaterPress} className="items-center">
+                        <IconSymbol name="bookmark" size={40} color={iconColor} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleTextPress} className="items-center">
-                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-                        <ThemedText className="text-xs mt-1">{t('actions.textSettings', 'Text')}</ThemedText>
+                    <TouchableOpacity onPress={handleUnreadPress} className="items-center">
+                        <IconSymbol name="paperplane.fill" size={40} color={iconColor} />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
-                        <IconSymbol name="globe.americas.fill" size={24} color={iconColor} />
-                        <ThemedText className="text-xs mt-1">{t('actions.openInBrowser', 'Browser')}</ThemedText>
+                        <IconSymbol name="globe.americas.fill" size={40} color={iconColor} />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleSharePress} className="items-center">
-                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-                        <ThemedText className="text-xs mt-1">{t('actions.share', 'Share')}</ThemedText>
+                        <IconSymbol name="paperplane.fill" size={40} color={iconColor} />
                     </TouchableOpacity>
                 </View>
 

@@ -5,7 +5,7 @@
   },
   "actions": {
     "goBack": "Go Back",
-    "back": "Back",
+    "bookmark": "Bookmark",
     "share": "Share",
     "openInBrowser": "Browser",
     "textSettings": "Text"

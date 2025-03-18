@@ -32,6 +32,10 @@ export default function TextSettingsModal({ visible, onClose, initialSettings, o
         onClose();
     };
 
+    const handleCancel = () => {
+        setSettings(initialSettings);
+        onClose();
+    }
     return (
         <Modal
             animationType="slide"
@@ -128,7 +132,7 @@ export default function TextSettingsModal({ visible, onClose, initialSettings, o
                     </TouchableOpacity>
                     <TouchableOpacity
                         className="items-center m-3"
-                        onPress={onClose}>
+                        onPress={handleCancel}>
                         <Text className="font-bold text-textSecondary-light dark:text-textSecondary-dark">
                             {t('textSettings.cancel', 'Cancel')}
                         </Text>

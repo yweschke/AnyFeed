@@ -10,6 +10,7 @@ export interface Article {
     updated?: Date;
     url: string;
     unread: boolean;
+    safedForLater: boolean;
 }
 export interface Author {
     name: string;

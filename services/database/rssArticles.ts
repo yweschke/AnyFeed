@@ -19,7 +19,8 @@ export const setupDatabase = async (): Promise<void> => {
                 authors TEXT,     
                 categories TEXT,  
                 images TEXT,
-                unread BOOLEAN NOT NULL DEFAULT 1
+                unread BOOLEAN NOT NULL DEFAULT 1,
+                safedForLater BOOLEAN NOT NULL DEFAULT 1
             );
         `);
 
@@ -34,8 +35,8 @@ export const insertArticle = async (article: Article, feedId: Feed.id): Promise<
         const db = await openDatabase();
 
         await db.runAsync(
-            `INSERT OR IGNORE INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images, unread)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            `INSERT OR IGNORE INTO rssArticles (feed_id, title, url, content, description, published, updated, authors, categories, images, unread, safedForLater)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 feedId,
                 article.title,
@@ -47,7 +48,8 @@ export const insertArticle = async (article: Article, feedId: Feed.id): Promise<
                 JSON.stringify(article.authors),      // Convert authors to JSON
                 JSON.stringify(article.categories),   // Convert categories to JSON
                 JSON.stringify(article.image),        // Convert image to JSON
-                article.unread                        // Set unread value
+                article.unread,
+                article.safedForLater// Set unread value
             ]
         );
 
@@ -84,7 +86,8 @@ export const getArticles = async (feedId: number): Promise<Article[]> => {
             authors: JSON.parse(row.authors || "[]"),
             categories: JSON.parse(row.categories || "[]"),
             image: JSON.parse(row.images || "null"),
-            unread: row.unread === 1
+            unread: row.unread === 1,
+            safedForLater: row.safedForLater === 1
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
@@ -115,7 +118,8 @@ export const getArticle = async (id: number): Promise<Article | null> => {
             authors: JSON.parse(rawArticle.authors || "[]"),
             categories: JSON.parse(rawArticle.categories || "[]"),
             image: JSON.parse(rawArticle.images || "null"),
-            unread: rawArticle.unread === 1
+            unread: rawArticle.unread === 1,
+            safedForLater: rawArticle.safedForLater === 1
         };
     } catch (error) {
         console.error("❌ Error fetching article by ID:", error);
@@ -142,7 +146,8 @@ export const getNewestArticles = async (feedId: number, limit: number): Promise<
             authors: JSON.parse(row.authors || "[]"),
             categories: JSON.parse(row.categories || "[]"),
             image: JSON.parse(row.images || "null"),
-            unread: row.unread === 1
+            unread: row.unread === 1,
+            safedForLater: row.safedForLater === 1
         }));
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
@@ -187,7 +192,8 @@ export const updateArticle = async (id: number, article: Article): Promise<void>
                  authors = ?,
                  categories = ?,
                  images = ?,
-                 unread = ?
+                 unread = ?,
+                 safedForLater = ?
              WHERE id = ?;`,
             [
                 article.title,
@@ -199,7 +205,8 @@ export const updateArticle = async (id: number, article: Article): Promise<void>
                 JSON.stringify(article.authors),      // Convert authors array to JSON string
                 JSON.stringify(article.categories),   // Convert categories array to JSON string
                 JSON.stringify(article.image),        // Convert images array to JSON string
-                article.unread ? 1 : 0,               // Convert boolean to SQLite integer
+                article.unread ? 1 : 0,
+                article.safedForLater ? 1 : 0,// Convert boolean to SQLite integer
                 id
             ]
         );
@@ -229,6 +236,26 @@ export const setToUnread = async (id: number): Promise<void> => {
         console.error('❌ Error marking article as unread:', error);
     }
 };
+
+export const setToSafedForLater = async (id: number): Promise<void> => {
+    try {
+        const db = await openDatabase();
+        await db.runAsync(`UPDATE rssArticles SET safedForLater = 1 WHERE id = ?;`, [id]);
+        console.log(`✅ Article with ID ${id} marked as safed for later`);
+    } catch (error) {
+        console.error('❌ Error marking article as safed for later:', error);
+    }
+}
+
+export const setToNotSafedForLater = async (id: number): Promise<void> => {
+    try {
+        const db = await openDatabase();
+        await db.runAsync(`UPDATE rssArticles SET safedForLater = 0 WHERE id = ?;`, [id]);
+        console.log(`✅ Article with ID ${id} marked as not safed for later`);
+    } catch (error) {
+        console.error('❌ Error marking article as not safed for later:', error);
+    }
+}
 
 export const deleteArticles = async (feedId: Feed.id): Promise<void> => {
     try {
@@ -264,6 +291,8 @@ export const deleteAllArticles = async (): Promise<void> => {
     try {
         const db = await openDatabase();
         await db.runAsync(`DELETE FROM rssArticles;`);
+        //delete rssArticles table
+        await db.runAsync(`DROP TABLE rssArticles;`);
         console.log('✅ All articles deleted successfully');
     } catch (error) {
         console.error('❌ Error deleting all articles:', error);

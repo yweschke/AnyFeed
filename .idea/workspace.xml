@@ -5,13 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/components/modals/TextSettingsModal.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/settings/TextSettings.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/article/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/article/[id].tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/reset-project.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modals/TextSettingsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modals/TextSettingsModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/i18n/en/article.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/i18n/en/article.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/rss-parser/fetchRSSFeed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/rssFeed/article.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/rssFeed/article.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +95,8 @@
       <workItem from="1741635137821" duration="5179000" />
       <workItem from="1741718815430" duration="2716000" />
       <workItem from="1741967173368" duration="8275000" />
+      <workItem from="1742154468904" duration="1893000" />
+      <workItem from="1742326184866" duration="645000" />
     </task>
     <servers />
   </component>
