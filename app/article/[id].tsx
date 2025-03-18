@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText.tsx';
-import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater } from '@/services/database/rssArticles.ts';
+import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread } from '@/services/database/rssArticles.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
 import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
@@ -27,6 +27,7 @@ export default function ArticleScreen() {
     const articleId = typeof id === 'string' ? parseInt(id, 10) : 0;
     const [article, setArticle] = useState<Article | null>(null);
     const [loading, setLoading] = useState(true);
+    const [viewOriginalWebsite, setViewOriginalWebsite] = useState(false);
     const router = useRouter();
     const { t } = useTranslation('article');
     const colorScheme = useColorScheme();
@@ -108,23 +109,22 @@ export default function ArticleScreen() {
 
     const handleUnreadPress = async () => {
         try {
-            if(article?.unread) {
-                await setToRead(article.id);
-                article.unread = false;
-            } else {
-                await setToNotRead(article.id);
-                article.unread = true;
+            if (article?.id) {
+                if (article.unread) {
+                    await setToRead(article.id);
+                    setArticle({...article, unread: false});
+                } else {
+                    await setToUnread(article.id);
+                    setArticle({...article, unread: true});
+                }
             }
         } catch (error) {
             console.error('Error updating unread status:', error);
         }
+    };
 
-    }
-
-    const handleOpenInBrowser = () => {
-        if (article?.url) {
-            router.push(article.url);
-        }
+    const handleToggleWebView = () => {
+        setViewOriginalWebsite(!viewOriginalWebsite);
     };
 
     const handleSaveTextSettings = async (newSettings: TextSettings) => {
@@ -138,27 +138,27 @@ export default function ArticleScreen() {
 
     const handleSafeForLaterPress = async () => {
         try {
-            if (article) {
+            if (article?.id) {
                 if (!article.safedForLater) {
                     await setToSafedForLater(article.id);
-                    article.safedForLater = true;
+                    setArticle({...article, safedForLater: true});
                 } else {
                     await setToNotSafedForLater(article.id);
-                    article.safedForLater = false;
+                    setArticle({...article, safedForLater: false});
                 }
             }
         } catch (error) {
-            console.error('Error saving text settings:', error);
+            console.error('Error updating saved for later status:', error);
         }
-    }
+    };
 
     // Create HTML content with appropriate styling based on theme and text settings
     const createHTMLContent = () => {
         if (!article) return '';
 
         let content;
-        if(article.content === "No content available") {
-            if(article.description === "No description available") {
+        if (article.content === "No content available") {
+            if (article.description === "No description available") {
                 content = 'No content available';
             } else {
                 // Fixed image element to properly use the URL with a fallback if image doesn't exist
@@ -296,44 +296,73 @@ export default function ArticleScreen() {
                     </View>
 
                     <TouchableOpacity onPress={handleTextPress} className="p-2">
-                        <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
+                        <IconSymbol name="textformat.size" size={24} color={iconColor} />
                     </TouchableOpacity>
                 </View>
 
                 {/* Content */}
                 <View className="flex-1">
-                    <WebView
-                        source={{ html: createHTMLContent() }}
-                        style={{ backgroundColor: 'transparent' }}
-                        originWhitelist={['*']}
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                        startInLoadingState={true}
-                        scalesPageToFit={false}
-                        renderLoading={() => (
-                            <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
-                                <ActivityIndicator size="large" color={activeColor} />
-                            </View>
-                        )}
-                    />
+                    {viewOriginalWebsite && article.url ? (
+                        <WebView
+                            source={{ uri: article.url }}
+                            style={{ backgroundColor: 'transparent' }}
+                            startInLoadingState={true}
+                            renderLoading={() => (
+                                <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                                    <ActivityIndicator size="large" color={activeColor} />
+                                </View>
+                            )}
+                        />
+                    ) : (
+                        <WebView
+                            source={{ html: createHTMLContent() }}
+                            style={{ backgroundColor: 'transparent' }}
+                            originWhitelist={['*']}
+                            javaScriptEnabled={true}
+                            domStorageEnabled={true}
+                            startInLoadingState={true}
+                            scalesPageToFit={false}
+                            renderLoading={() => (
+                                <View className="absolute inset-0 justify-center items-center bg-primary-light dark:bg-primary-dark">
+                                    <ActivityIndicator size="large" color={activeColor} />
+                                </View>
+                            )}
+                        />
+                    )}
                 </View>
 
                 {/* Bottom Navigation Bar */}
                 <View className="flex-row p-10 pb-safe justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
                     <TouchableOpacity onPress={handleSafeForLaterPress} className="items-center">
-                        <IconSymbol name="bookmark" size={40} color={iconColor} />
+                        <IconSymbol
+                            name={article.safedForLater ? "bookmark.fill" : "bookmark"}
+                            size={28}
+                            color={article.safedForLater ? activeColor : iconColor}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleUnreadPress} className="items-center">
-                        <IconSymbol name="paperplane.fill" size={40} color={iconColor} />
+                        <IconSymbol
+                            name={article.unread ? "envelope" : "envelope.open"}
+                            size={28}
+                            color={article.unread ? activeColor : iconColor}
+                        />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleOpenInBrowser} className="items-center">
-                        <IconSymbol name="globe.americas.fill" size={40} color={iconColor} />
+                    <TouchableOpacity onPress={handleToggleWebView} className="items-center">
+                        <IconSymbol
+                            name="globe"
+                            size={28}
+                            color={viewOriginalWebsite ? activeColor : iconColor}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleSharePress} className="items-center">
-                        <IconSymbol name="paperplane.fill" size={40} color={iconColor} />
+                        <IconSymbol
+                            name="square.and.arrow.up"
+                            size={28}
+                            color={iconColor}
+                        />
                     </TouchableOpacity>
                 </View>
 

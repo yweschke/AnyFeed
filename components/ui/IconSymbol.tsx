@@ -13,11 +13,21 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'bookmark.fill': 'bookmark',
+  'bookmark': 'bookmark_border',
+  'envelope': 'email',
+  'envelope.open': 'drafts',
+  'globe': 'public',
+  'globe.americas.fill': 'public',
+  'square.and.arrow.up': 'share',
+  'textformat.size': 'text_fields',
+  'chevron.backward': 'arrow_back',
+  'search': 'search', // Just to be explicit
 } as Partial<
-  Record<
-    import('expo-symbols').SymbolViewProps['name'],
-    React.ComponentProps<typeof MaterialIcons>['name']
-  >
+    Record<
+        import('expo-symbols').SymbolViewProps['name'],
+        React.ComponentProps<typeof MaterialIcons>['name']
+    >
 >;
 
 export type IconSymbolName = keyof typeof MAPPING;
@@ -28,16 +38,18 @@ export type IconSymbolName = keyof typeof MAPPING;
  * Icon `name`s are based on SFSymbols and require manual mapping to MaterialIcons.
  */
 export function IconSymbol({
-  name,
-  size = 24,
-  color,
-  style,
-}: {
+                             name,
+                             size = 24,
+                             color,
+                             style,
+                           }: {
   name: IconSymbolName;
   size?: number;
   color: string | OpaqueColorValue;
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  // If the name is not in our mapping, use a default icon
+  const iconName = MAPPING[name] || 'help_outline';
+  return <MaterialIcons color={color} size={size} name={iconName} style={style} />;
 }
