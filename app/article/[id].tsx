@@ -1,6 +1,6 @@
 // app/article/[id].tsx
 import React, { useEffect, useState, useRef } from 'react';
-import { View, ActivityIndicator, TouchableOpacity, Share, StatusBar, FlatList, Dimensions, Animated } from 'react-native';
+import { Text, View, ActivityIndicator, TouchableOpacity, Share, StatusBar, FlatList, Dimensions, Animated } from 'react-native';
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,10 +11,10 @@ import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setTo
 import { openDatabase } from '@/services/database/feeds.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
-import { IconSymbol } from '@/components/ui/IconSymbol.tsx';
 import { useColorScheme } from '@/hooks/useColorScheme.ts';
 import TextSettingsModal, { TextSettings } from '@/components/modals/TextSettingsModal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 // Default text settings
 const DEFAULT_TEXT_SETTINGS: TextSettings = {
@@ -39,9 +39,9 @@ export default function ArticleScreen() {
     const { t } = useTranslation('article');
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
-    const flatListRef = useRef(null); // Changed type to allow AnimatedFlatList
+    const flatListRef = useRef(null);
 
-    // Text settings state
+    // Text settings state for modal
     const [textSettings, setTextSettings] = useState<TextSettings>(DEFAULT_TEXT_SETTINGS);
     const [textSettingsModalVisible, setTextSettingsModalVisible] = useState(false);
 
@@ -339,6 +339,8 @@ export default function ArticleScreen() {
             </head>
             <body>
                 <h1>${article.title || ''}</h1>
+                <p>${article.authors[0]?.name || ''}</p>
+                <p>${article.published || ''}</p>
                 ${htmlContent}
             </body>
             </html>
@@ -403,20 +405,36 @@ export default function ArticleScreen() {
 
         return (
             <View className="flex-row justify-center items-center mx-4">
-                {currentArticleIndex > 0 && (
+                {currentArticleIndex > 0 && currentArticleIndex < 3 ? (
                     <TouchableOpacity
                         onPress={() => setCurrentArticleIndex(Math.max(0, currentArticleIndex - 1))}
                         className="px-1"
                     >
-                        <IconSymbol name="chevron.left" size={16} color={iconColor} />
+                        <Ionicons
+                            name="chevron-back-outline"
+                            size={16}
+                            color={iconColor}
+                        />
                     </TouchableOpacity>
-                )}
-
-                {startDot > 0 && (
-                    <View className="px-1">
-                        <ThemedText>...</ThemedText>
-                    </View>
-                )}
+                ): currentArticleIndex > 0 &&
+                    (
+                        <TouchableOpacity
+                            onPress={() => setCurrentArticleIndex(0)}
+                            className="px-1 flex flex-row items-center"
+                        >
+                            <Ionicons
+                                name="chevron-back-outline"
+                                size={16}
+                                color={iconColor}
+                            />
+                            <Ionicons
+                                name="chevron-back-outline"
+                                size={16}
+                                color={iconColor}
+                            />
+                        </TouchableOpacity>
+                    )
+                }
 
                 {Array.from({ length: endDot - startDot }, (_, i) => i + startDot).map((index) => (
                     <TouchableOpacity
@@ -435,20 +453,36 @@ export default function ArticleScreen() {
                     </TouchableOpacity>
                 ))}
 
-                {endDot < articles.length && (
-                    <View className="px-1">
-                        <ThemedText>...</ThemedText>
-                    </View>
-                )}
-
-                {currentArticleIndex < articles.length - 1 && (
+                {currentArticleIndex < articles.length - 1 && currentArticleIndex >= articles.length - 3 ? (
                     <TouchableOpacity
                         onPress={() => setCurrentArticleIndex(Math.min(articles.length - 1, currentArticleIndex + 1))}
                         className="px-1"
                     >
-                        <IconSymbol name="chevron.right" size={16} color={iconColor} />
+                        <Ionicons
+                            name="chevron-forward-outline"
+                            size={16}
+                            color={iconColor}
+                        />
                     </TouchableOpacity>
-                )}
+                ): currentArticleIndex < articles.length - 1 &&
+                (
+                    <TouchableOpacity
+                        onPress={() => setCurrentArticleIndex(articles.length - 1)}
+                        className="px-1 flex flex-row items-center"
+                    >
+                        <Ionicons
+                            name="chevron-forward-outline"
+                            size={16}
+                            color={iconColor}
+                        />
+                        <Ionicons
+                            name="chevron-forward-outline"
+                            size={16}
+                            color={iconColor}
+                        />
+                    </TouchableOpacity>
+                )
+                }
             </View>
         );
     };
@@ -491,9 +525,13 @@ export default function ArticleScreen() {
 
                 {/* Custom Top Navigation Bar */}
                 <View className="bg-secondary-light dark:bg-secondary-dark border-b border-accent-light dark:border-accent-dark">
-                    <View className="flex-row justify-between items-center px-4 py-3">
+                    <View className="flex-row justify-between items-center px-4 pt-3">
                         <TouchableOpacity onPress={handleBackPress} className="p-2">
-                            <IconSymbol name="chevron.backward" size={24} color={iconColor} />
+                            <Ionicons
+                                name="arrow-back"
+                                size={28}
+                                color={iconColor}
+                            />
                         </TouchableOpacity>
 
                         <View className="flex-1 px-4">
@@ -503,10 +541,16 @@ export default function ArticleScreen() {
                         </View>
 
                         <TouchableOpacity onPress={handleTextPress} className="p-2">
-                            <IconSymbol name="textformat.size" size={24} color={iconColor} />
+                            <Ionicons
+                                name="text"
+                                size={28}
+                                color={iconColor}
+                            />
                         </TouchableOpacity>
                     </View>
-
+                    <View className="items-center">
+                        <Text className="text-textPrimary-light dark:text-textPrimary-dark text-base">feed</Text>
+                    </View>
                     {/* Pagination Dots */}
                     <View className="py-2">
                         {renderPaginationDots()}
@@ -543,32 +587,32 @@ export default function ArticleScreen() {
                 {/* Bottom Navigation Bar */}
                 <View className="flex-row p-10 pb-safe justify-around items-center py-3 bg-secondary-light dark:bg-secondary-dark border-t border-accent-light dark:border-accent-dark">
                     <TouchableOpacity onPress={handleSafeForLaterPress} className="items-center">
-                        <IconSymbol
-                            name={currentArticle.safedForLater ? "bookmark.fill" : "bookmark"}
+                        <Ionicons
+                            name={currentArticle.safedForLater ? "bookmark" : "bookmark-outline"}
                             size={28}
                             color={currentArticle.safedForLater ? activeColor : iconColor}
                         />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleUnreadPress} className="items-center">
-                        <IconSymbol
-                            name={currentArticle.unread ? "envelope" : "envelope.open"}
+                        <Ionicons
+                            name={!currentArticle.unread ? "checkbox-sharp" : "checkbox-outline"}
                             size={28}
-                            color={currentArticle.unread ? activeColor : iconColor}
+                            color={!currentArticle.unread ? activeColor : iconColor}
                         />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleToggleWebView} className="items-center">
-                        <IconSymbol
-                            name="globe"
+                        <Ionicons
+                            name={viewOriginalWebsite ? "globe" : "globe-outline"}
                             size={28}
                             color={viewOriginalWebsite ? activeColor : iconColor}
                         />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleSharePress} className="items-center">
-                        <IconSymbol
-                            name="square.and.arrow.up"
+                        <Ionicons
+                            name="share-outline"
                             size={28}
                             color={iconColor}
                         />
