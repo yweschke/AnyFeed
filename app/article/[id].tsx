@@ -137,17 +137,25 @@ export default function ArticleScreen() {
 
     // Scroll to the current article when the index changes
     useEffect(() => {
-        if (flatListRef.current && articles.length > 0) {
-            flatListRef.current.scrollToIndex({
-                index: currentArticleIndex,
-                animated: false,
-                viewPosition: 0
-            });
+        try {
+            if (flatListRef.current && articles.length > 0) {
+                flatListRef.current.scrollToIndex({
+                    index: currentArticleIndex,
+                    animated: false,
+                    viewPosition: 0
+                });
+            }
+        } catch  (error) {
+            console.error('Error scrolling to index:', error);
         }
     }, [currentArticleIndex, articles.length]);
 
     const handleBackPress = () => {
-        router.back();
+        try {
+            router.back();
+        } catch (error) {
+            console.error('Error going back:', error);
+        }
     };
 
     const handleSharePress = async () => {
@@ -165,7 +173,11 @@ export default function ArticleScreen() {
     };
 
     const handleTextPress = () => {
-        setTextSettingsModalVisible(true);
+        try {
+            setTextSettingsModalVisible(true);
+        } catch (error) {
+            console.error('Error opening text settings:', error);
+        }
     };
 
     const handleUnreadPress = async () => {
@@ -193,7 +205,11 @@ export default function ArticleScreen() {
     };
 
     const handleToggleWebView = () => {
-        setViewOriginalWebsite(!viewOriginalWebsite);
+        try {
+            setViewOriginalWebsite(!viewOriginalWebsite);
+        } catch (error) {
+            console.error('Error toggleWebView:', error);
+        }
     };
 
     const handleSaveTextSettings = async (newSettings: TextSettings) => {
@@ -231,46 +247,51 @@ export default function ArticleScreen() {
 
     // Handle FlatList scroll event to mark articles as read when they come into view
     const handleViewableItemsChanged = async ({ viewableItems }) => {
-        if (viewableItems.length > 0) {
-            const viewedArticleIndex = viewableItems[0].index;
-            setCurrentArticleIndex(viewedArticleIndex);
+        try {
+            if (viewableItems.length > 0) {
+                const viewedArticleIndex = viewableItems[0].index;
+                setCurrentArticleIndex(viewedArticleIndex);
 
-            // Mark article as read when it comes into view
-            const article = articles[viewedArticleIndex];
-            if (article && article.id && article.unread) {
-                await setToRead(article.id);
+                // Mark article as read when it comes into view
+                const article = articles[viewedArticleIndex];
+                if (article && article.id && article.unread) {
+                    await setToRead(article.id);
 
-                // Update the articles array with the read status
-                const updatedArticles = [...articles];
-                updatedArticles[viewedArticleIndex] = { ...updatedArticles[viewedArticleIndex], unread: false };
-                setArticles(updatedArticles);
+                    // Update the articles array with the read status
+                    const updatedArticles = [...articles];
+                    updatedArticles[viewedArticleIndex] = { ...updatedArticles[viewedArticleIndex], unread: false };
+                    setArticles(updatedArticles);
+                }
             }
+        } catch (error) {
+            console.error('Error setting article to read:', error);
         }
     };
 
     // Create HTML content with appropriate styling based on theme and text settings
     const createHTMLContent = (article: Article) => {
-        if (!article) return '';
+        try {
+            if (!article) return '';
 
-        let content;
-        if (article.content === "No content available") {
-            if (article.description === "No description available") {
-                content = 'No content available';
+            let content;
+            if (article.content === "No content available") {
+                if (article.description === "No description available") {
+                    content = 'No content available';
+                } else {
+                    // Fixed image element to properly use the URL with a fallback if image doesn't exist
+                    content = article.image?.url
+                        ? `<div style="text-align: center; margin-bottom: 20px;"> <img src="${article.image.url}" alt="${article.image?.title || 'Article image'}" style="width:100%; height:auto; float:left; margin-right:15px; margin-bottom:10px;"/> </div> <div>${article.description}</div>`
+                        : article.description;
+                }
             } else {
-                // Fixed image element to properly use the URL with a fallback if image doesn't exist
-                content = article.image?.url
-                    ? `<div style="text-align: center; margin-bottom: 20px;"> <img src="${article.image.url}" alt="${article.image?.title || 'Article image'}" style="width:100%; height:auto; float:left; margin-right:15px; margin-bottom:10px;"/> </div> <div>${article.description}</div>`
-                    : article.description;
+                content = article.content;
             }
-        } else {
-            content = article.content;
-        }
 
-        const htmlContent = content || '';
-        const textColor = isDark ? '#ffffff' : '#000000';
-        const linkColor = isDark ? '#60a5fa' : '#0284c7';
+            const htmlContent = content || '';
+            const textColor = isDark ? '#ffffff' : '#000000';
+            const linkColor = isDark ? '#60a5fa' : '#0284c7';
 
-        return `
+            return `
             <!DOCTYPE html>
             <html>
             <head>
@@ -345,6 +366,10 @@ export default function ArticleScreen() {
             </body>
             </html>
         `;
+        } catch (error) {
+            console.error('Error creating HTML content:', error);
+            return 'An error occurred while loading the article.';
+        }
     };
 
     // Render individual article item
