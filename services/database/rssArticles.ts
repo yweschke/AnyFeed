@@ -1,6 +1,8 @@
 import { openDatabase} from './feeds.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { Feed } from '@/types/rssFeed/feed.ts';
+import {util} from "node-forge";
+import raw = module
 
 export const setupDatabase = async (): Promise<void> => {
     try {
@@ -77,6 +79,7 @@ export const getArticles = async (feedId: number): Promise<Article[]> => {
 
         return rawArticles.map((row: any) => ({
             id: row.id,
+            feedId: row.feed_id,
             title: row.title,
             url: row.url,
             content: row.content,
@@ -109,6 +112,7 @@ export const getArticle = async (id: number): Promise<Article | null> => {
 
         return {
             id: rawArticle.id,
+            feedId: rawArticle.feed_id,
             title: rawArticle.title,
             url: rawArticle.url,
             content: rawArticle.content,
@@ -137,6 +141,7 @@ export const getNewestArticles = async (feedId: number, limit: number): Promise<
 
         return rawArticles.map((row: any) => ({
             id: row.id,
+            feedId: row.feed_id,
             title: row.title,
             url: row.url,
             content: row.content,

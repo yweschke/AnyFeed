@@ -1,5 +1,6 @@
 export interface Article {
     id?: number;        // Add ID property
+    feedId: number;     // Add feedId property
     authors: Author[];
     categories: Category[];
     content?: string;

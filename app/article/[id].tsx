@@ -86,17 +86,7 @@ export default function ArticleScreen() {
                     return;
                 }
 
-                // gettin feed id
-                const db = await openDatabase();
-                const result = await db.getAllAsync(`SELECT feed_id FROM rssArticles WHERE id = ?;`, [initialArticleId]);
-
-                if (!result || result.length === 0) {
-                    console.error('Could not find feed_id for article:', initialArticleId);
-                    setLoading(false);
-                    return;
-                }
-
-                const feedId = result[0].feed_id;
+                const feedId = currentArticle.feedId;
                 console.log('Loading articles from feed ID:', feedId);
 
                 // Get all articles from the same feed
