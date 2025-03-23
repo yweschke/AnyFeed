@@ -125,7 +125,6 @@ export default function ArticleList() {
                 renderItem={({ item }) => (
                     <ArticleCard
                         article={item}
-                        onPress={() => handleArticlePress(item)}
                     />
                 )}
                 onScroll={Animated.event(

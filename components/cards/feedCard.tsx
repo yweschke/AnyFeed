@@ -13,11 +13,6 @@ export default function FeedCard({ feed, articles }: { feed: Feed, articles: Art
         router.push(`/feed/${feed.id}`);
     };
 
-    const handleArticlePress = (article: Article) => {
-        console.log('Article pressed:', article.title);
-        // Navigation to article detail screen would go here
-    };
-
     return (
         <View className="bg-secondary-light dark:bg-secondary-dark shadow shadow-accent-light dark:shadow-accent-dark p-2 rounded-lg m-3 justify-center items-center">
             <TouchableOpacity onPress={handleFeedPress}>
@@ -28,7 +23,6 @@ export default function FeedCard({ feed, articles }: { feed: Feed, articles: Art
             {articles.length > 0 && (
                 <ArticleBigCard
                     article={articles[0]}
-                    onPress={() => handleArticlePress(articles[0])}
                 />
             )}
 
@@ -38,7 +32,6 @@ export default function FeedCard({ feed, articles }: { feed: Feed, articles: Art
                     <ArticleCard
                         key={article.url}
                         article={article}
-                        onPress={() => handleArticlePress(article)}
                     />
                 ))
             }

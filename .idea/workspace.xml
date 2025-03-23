@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/article/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/article/[id].tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/rssFeed/article.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/rssFeed/article.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cards/articleCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cards/feedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/feedCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/database/rssFeeds.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssFeeds.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +99,7 @@
       <workItem from="1742326184866" duration="5860000" />
       <workItem from="1742412922401" duration="5316000" />
       <workItem from="1742500502973" duration="1673000" />
+      <workItem from="1742756420049" duration="2853000" />
     </task>
     <servers />
   </component>

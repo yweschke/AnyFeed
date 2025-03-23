@@ -4,22 +4,17 @@ import { useRouter } from "expo-router";
 import { Article } from "@/types/rssFeed/article.ts";
 import { useTimeAgo } from "@/hooks/useTimeAgo.ts";
 
-export default function ArticleBigCard({ article, onPress }: { article: Article; onPress: () => void }) {
+export default function ArticleBigCard({ article}: { article: Article}) {
     const getTimeAgo = useTimeAgo();
     const timeAgo = getTimeAgo(article.published);
     const router = useRouter();
 
     const handlePress = () => {
-        // Navigate to the article detail page using the article ID as the parameter
         if (article.id) {
             console.log("Navigating to article:", article.id);
             router.push(`/article/${article.id}`);
         } else {
             console.warn("Article has no ID, cannot navigate");
-        }
-
-        if (onPress) {
-            onPress();
         }
     };
 

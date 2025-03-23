@@ -26,6 +26,16 @@ export const insertFeed = async (title: string, url: string) => {
     }
 };
 
+export const getFeed = async (id: number): Promise<Feed | null> => {
+    try {
+        const db = await openDatabase();
+        return await db.getAllAsync(`SELECT * FROM rssFeeds WHERE id = ?;`, [id]);
+    } catch (error) {
+        console.error('❌ Error fetching feed:', error);
+        return null;
+    }
+}
+
 export const getFeeds = async (): Promise<Feed[]> => {
     try {
         const db = await openDatabase();

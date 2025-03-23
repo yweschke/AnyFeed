@@ -8,7 +8,7 @@ import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText.tsx';
 import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread, getArticles } from '@/services/database/rssArticles.ts';
-import { openDatabase } from '@/services/database/feeds.ts';
+import { getFeed } from '@/services/database/rssFeeds.ts';
 import { Article } from '@/types/rssFeed/article.ts';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '@/hooks/useColorScheme.ts';
@@ -33,6 +33,7 @@ export default function ArticleScreen() {
     const initialArticleId = typeof id === 'string' ? parseInt(id, 10) : 0;
     const [currentArticleIndex, setCurrentArticleIndex] = useState(0);
     const [articles, setArticles] = useState<Article[]>([]);
+    const [feed, setFeed] = useState<String | null>(null);
     const [loading, setLoading] = useState(true);
     const [viewOriginalWebsite, setViewOriginalWebsite] = useState(false);
     const router = useRouter();
@@ -99,6 +100,8 @@ export default function ArticleScreen() {
                 );
 
                 setArticles(sortedArticles);
+                const feed = await getFeed(feedId);
+                setFeed(feed);
 
                 // Find the index of the current article
                 const index = sortedArticles.findIndex(article => article.id === initialArticleId);
@@ -258,6 +261,16 @@ export default function ArticleScreen() {
         }
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
     // Create HTML content with appropriate styling based on theme and text settings
     const createHTMLContent = (article: Article) => {
         try {
@@ -270,7 +283,7 @@ export default function ArticleScreen() {
                 } else {
                     // Fixed image element to properly use the URL with a fallback if image doesn't exist
                     content = article.image?.url
-                        ? `<div style="text-align: center; margin-bottom: 20px;"> <img src="${article.image.url}" alt="${article.image?.title || 'Article image'}" style="width:100%; height:auto; float:left; margin-right:15px; margin-bottom:10px;"/> </div> <div>${article.description}</div>`
+                        ? `<div style="text-align: center; margin-bottom: 10px;"> <img src="${article.image.url}" alt="${article.image?.title || 'Article image'}" style="width:100%; height:auto; float:left; margin-right:15px; margin-bottom:10px;"/> </div> <div>${article.description}</div>`
                         : article.description;
                 }
             } else {
@@ -279,7 +292,15 @@ export default function ArticleScreen() {
 
             const htmlContent = content || '';
             const textColor = isDark ? '#ffffff' : '#000000';
+            const secondaryTextColor = isDark ? '#8ca0b4' : '#50647f'; // Secondary text color from theme
             const linkColor = isDark ? '#60a5fa' : '#0284c7';
+
+            const authorName = article.authors && article.authors.length > 0 ? article.authors[0]?.name : '';
+            const publishedDate = formatDate(article.published);
+
+            // Create info line with author and date
+            const infoLine = (authorName || publishedDate) ?
+                `<div style="font-size: ${textSettings.fontSize - 2}px; color: ${secondaryTextColor}; margin-bottom: 10px; display: flex;">${authorName}${authorName && publishedDate ? ' • ' : ''}${publishedDate}</div>` : '';
 
             return `
             <!DOCTYPE html>
@@ -307,8 +328,8 @@ export default function ArticleScreen() {
                     text-decoration: none;
                 }
                 h1, h2, h3, h4, h5, h6 {
-                    margin-top: 24px;
-                    margin-bottom: 16px;
+                    margin-top: 10px;
+                    margin-bottom: 10px;
                     line-height: 1.2; /* Added to fix multi-line heading spacing */
                     font-family: ${textSettings.fontFamily};
                 }
@@ -346,15 +367,19 @@ export default function ArticleScreen() {
                     text-align: center;
                     margin-bottom: 20px;
                 }
-                </style>
-            </head>
-            <body>
-                <h1>${article.title || ''}</h1>
-                <p>${article.authors[0]?.name || ''}</p>
-                <p>${article.published || ''}</p>
-                ${htmlContent}
-            </body>
-            </html>
+                .info-container {
+                        display: inline;
+                        color: ${secondaryTextColor};
+                        font-size: ${textSettings.fontSize - 2}px;
+                    }
+                    </style>
+                </head>
+                <body>
+                    <h1>${article.title || ''}</h1>
+                    ${infoLine}
+                    ${htmlContent}
+                </body>
+                </html>
         `;
         } catch (error) {
             console.error('Error creating HTML content:', error);
@@ -564,7 +589,7 @@ export default function ArticleScreen() {
                         </TouchableOpacity>
                     </View>
                     <View className="items-center">
-                        <Text className="text-textPrimary-light dark:text-textPrimary-dark text-base">feed</Text>
+                        <Text className="text-textPrimary-light dark:text-textPrimary-dark text-base">{feed[0]?.title}</Text>
                     </View>
                     {/* Pagination Dots */}
                     <View className="py-2">
