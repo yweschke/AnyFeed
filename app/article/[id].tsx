@@ -22,6 +22,8 @@ const DEFAULT_TEXT_SETTINGS: TextSettings = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
 };
 
+const ARTICLES_PER_PAGE = 10;
+
 // Storage key for saved text settings
 const TEXT_SETTINGS_STORAGE_KEY = 'article_text_settings';
 
@@ -35,13 +37,16 @@ export default function ArticleScreen() {
     const [articles, setArticles] = useState<Article[]>([]);
     const [feed, setFeed] = useState<String | null>(null);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [viewOriginalWebsite, setViewOriginalWebsite] = useState(false);
+    const [hasMoreArticles, setHasMoreArticles] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [feedId, setFeedId] = useState<number | null>(null);
     const router = useRouter();
     const { t } = useTranslation('article');
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
     const flatListRef = useRef(null);
-
     // Text settings state for modal
     const [textSettings, setTextSettings] = useState<TextSettings>(DEFAULT_TEXT_SETTINGS);
     const [textSettingsModalVisible, setTextSettingsModalVisible] = useState(false);
@@ -72,7 +77,7 @@ export default function ArticleScreen() {
     }, []);
 
     useEffect(() => {
-        const loadArticlesFromFeed = async () => {
+        const loadInitialArticle = async () => {
             try {
                 if (initialArticleId <= 0) {
                     setLoading(false);
@@ -87,46 +92,87 @@ export default function ArticleScreen() {
                     return;
                 }
 
-                const feedId = currentArticle.feedId;
-                console.log('Loading articles from feed ID:', feedId);
+                const articleFeedId = currentArticle.feedId;
+                setFeedId(articleFeedId);
+                console.log('Loading articles from feed ID:', articleFeedId);
 
-                // Get all articles from the same feed
-                const feedArticles = await getArticles(feedId);
-                console.log('Loaded articles count:', feedArticles.length);
+                // Load the feed information
+                const feedInfo = await getFeed(articleFeedId);
+                setFeed(feedInfo);
 
-                // Sort articles by date (newest first)
-                const sortedArticles = feedArticles.sort((a, b) =>
-                    new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime()
-                );
-
-                setArticles(sortedArticles);
-                const feed = await getFeed(feedId);
-                setFeed(feed);
-
-                // Find the index of the current article
-                const index = sortedArticles.findIndex(article => article.id === initialArticleId);
-                if (index !== -1) {
-                    setCurrentArticleIndex(index);
-
-                    // Mark the current article as read
-                    if (sortedArticles[index].unread && sortedArticles[index].id) {
-                        await setToRead(sortedArticles[index].id);
-
-                        // Update the articles array with the read status
-                        const updatedArticles = [...sortedArticles];
-                        updatedArticles[index] = { ...updatedArticles[index], unread: false };
-                        setArticles(updatedArticles);
-                    }
-                }
+                // Load the first batch of articles
+                await loadArticles(articleFeedId, 1, initialArticleId);
             } catch (error) {
-                console.error('Error loading articles:', error);
-            } finally {
+                console.error('Error loading initial article:', error);
                 setLoading(false);
             }
         };
 
-        loadArticlesFromFeed();
+        loadInitialArticle();
     }, [initialArticleId]);
+
+    // Function to load articles with pagination
+    const loadArticles = async (feedId: number, page: number, focusArticleId?: number) => {
+        try {
+            setLoadingMore(true);
+
+            const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+            const feedArticles = await getArticles(feedId, ARTICLES_PER_PAGE, offset);
+            console.log(`Loaded ${feedArticles.length} articles for page ${page}`);
+
+            setHasMoreArticles(feedArticles.length === ARTICLES_PER_PAGE);
+
+            const sortedArticles = feedArticles.sort((a, b) =>
+                new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime()
+            );
+
+            if (page === 1) {
+                setArticles(sortedArticles);
+
+                if (focusArticleId) {
+                    const index = sortedArticles.findIndex(article => article.id === focusArticleId);
+                    if (index !== -1) {
+                        setCurrentArticleIndex(index);
+
+                        if (sortedArticles[index].unread && sortedArticles[index].id) {
+                            await setToRead(sortedArticles[index].id);
+
+                            const updatedArticles = [...sortedArticles];
+                            updatedArticles[index] = { ...updatedArticles[index], unread: false };
+                            setArticles(updatedArticles);
+                        }
+                    }
+                }
+            } else {
+                // Subsequent pages - append to existing articles
+                setArticles(prevArticles => [...prevArticles, ...sortedArticles]);
+            }
+
+            setCurrentPage(page);
+        } catch (error) {
+            console.error('Error loading articles:', error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    };
+
+    // Load more articles when needed
+    const loadMoreArticles = async () => {
+        if (loadingMore || !hasMoreArticles || !feedId) return;
+
+        console.log('Loading more articles, page:', currentPage + 1);
+        await loadArticles(feedId, currentPage + 1);
+    };
+
+    // This will be called when the user scrolls close to the end
+    const checkForMoreArticles = (index: number) => {
+        // If we're within 3 articles of the end, and we have more to load
+        if (hasMoreArticles && index >= articles.length - 3 && !loadingMore) {
+            loadMoreArticles();
+        }
+    };
 
     // Scroll to the current article when the index changes
     useEffect(() => {
@@ -238,12 +284,14 @@ export default function ArticleScreen() {
         }
     };
 
-    // Handle FlatList scroll event to mark articles as read when they come into view
     const handleViewableItemsChanged = async ({ viewableItems }) => {
         try {
             if (viewableItems.length > 0) {
                 const viewedArticleIndex = viewableItems[0].index;
                 setCurrentArticleIndex(viewedArticleIndex);
+
+                // Check if we need to load more articles when approaching the end
+                checkForMoreArticles(viewedArticleIndex);
 
                 // Mark article as read when it comes into view
                 const article = articles[viewedArticleIndex];
@@ -621,6 +669,11 @@ export default function ArticleScreen() {
                             [{ nativeEvent: { contentOffset: { x: scrollX } } }],
                             { useNativeDriver: true }
                         )}
+                        ListFooterComponent={loadingMore ? (
+                            <View style={{ width, justifyContent: 'center', alignItems: 'center' }}>
+                                <ActivityIndicator size="large" color={activeColor} />
+                            </View>
+                        ) : null}
                     />
                 </View>
 

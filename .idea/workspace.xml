@@ -7,11 +7,9 @@
     <list default="true" id="6062b2d4-17c5-4ce7-af6c-7e3a2756b714" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/article/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/article/[id].tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleBigCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/articleCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/articleCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/cards/feedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/cards/feedCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/lists/articleList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/lists/articleList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/database/rssFeeds.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssFeeds.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/database/rssArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/rssArticles.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/i18n/en/feed.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/i18n/en/feed.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,12 +25,12 @@
     &quot;assignee&quot;: &quot;yweschke&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/yweschke/ParadiseRSS.git&quot;,
-    &quot;accountId&quot;: &quot;0c0c0b50-7b8c-4a45-8b26-8bc784c5eb52&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/yweschke/AnyFeed.git",
+    "accountId": "0c0c0b50-7b8c-4a45-8b26-8bc784c5eb52"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 1

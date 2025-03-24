@@ -72,10 +72,34 @@ export const insertArticles = async (articles: Article[], feedId: Feed.id): Prom
     }
 }
 
-export const getArticles = async (feedId: number): Promise<Article[]> => {
+export const getArticles = async (feedId: number, limit: number = 0, offset: number = 0): Promise<Article[]> => {
     try {
         const db = await openDatabase();
-        const rawArticles = await db.getAllAsync(`SELECT * FROM rssArticles WHERE feed_id = ?;`, [feedId]);
+        let query = `SELECT * FROM rssArticles WHERE feed_id = ?`;
+
+        // Add ORDER BY to ensure consistent results
+        query += ` ORDER BY published DESC`;
+
+        // Add LIMIT and OFFSET clauses for pagination
+        const params: any[] = [feedId];
+
+        if (limit > 0) {
+            query += ` LIMIT ?`;
+            params.push(limit);
+
+            if (offset > 0) {
+                query += ` OFFSET ?`;
+                params.push(offset);
+            }
+        }
+
+        // Add semicolon to end of query
+        query += `;`;
+
+        console.log(`Executing query with limit ${limit} and offset ${offset}`);
+
+        // Execute query with appropriate parameters
+        const rawArticles = await db.getAllAsync(query, params);
 
         return rawArticles.map((row: any) => ({
             id: row.id,
@@ -95,6 +119,22 @@ export const getArticles = async (feedId: number): Promise<Article[]> => {
     } catch (error) {
         console.error('❌ Error fetching articles:', error);
         return [];
+    }
+}
+
+// Optional: Helper function to get the total count of articles for a feed
+export const getArticlesCount = async (feedId: number): Promise<number> => {
+    try {
+        const db = await openDatabase();
+        const result = await db.getAllAsync(
+            `SELECT COUNT(*) as count FROM rssArticles WHERE feed_id = ?;`,
+            [feedId]
+        );
+
+        return result[0]?.count || 0;
+    } catch (error) {
+        console.error('❌ Error counting articles:', error);
+        return 0;
     }
 }
 

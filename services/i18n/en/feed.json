@@ -2,10 +2,28 @@
   "feed": {
     "articlesCount": "{{count}} unread Articles in this feed!",
     "noArticles": "No articles found for this feed",
-    "loading": "Loading articles..."
+    "loading": "Loading articles...",
+    "limitedView": "Showing recent {{count}} articles",
+    "loadMore": "Load more articles",
+    "noMoreArticles": "No more articles available",
+    "loadingMore": "Loading more articles..."
   },
-  "error": {
-    "feedNotFound": "Feed not found",
-    "loadingFailed": "Failed to load feed details"
+  "article": {
+    "error": {
+      "articleNotFound": "Article not found",
+      "loadingFailed": "Failed to load article"
+    },
+    "actions": {
+      "goBack": "Go Back",
+      "bookmark": "Bookmark",
+      "share": "Share",
+      "openInBrowser": "Browser",
+      "textSettings": "Text",
+      "loadMore": "Load more articles"
+    },
+    "pagination": {
+      "loading": "Loading more articles...",
+      "noMore": "No more articles available"
+    }
   }
 }
