@@ -1,6 +1,3 @@
-// Enhanced ArticleList component with pagination
-// For components/lists/articleList.tsx
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, View, FlatList, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
@@ -17,8 +14,6 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
-
-// Constants for pagination
 const ARTICLES_PER_PAGE = 10;
 
 export default function ArticleList() {
@@ -75,31 +70,23 @@ export default function ArticleList() {
         loadFeedData();
     }, [feedId]);
 
-    // Function to load articles with pagination
     const loadArticles = async (feedId: number, page: number) => {
         try {
             setLoadingMore(true);
-
-            // Calculate offset based on page number
             const offset = (page - 1) * ARTICLES_PER_PAGE;
 
-            // Get articles for this page
             const feedArticles = await getArticles(feedId, ARTICLES_PER_PAGE, offset);
             console.log(`Loaded ${feedArticles.length} articles for page ${page}`);
 
-            // Check if we have more articles to load
             setHasMoreArticles(feedArticles.length === ARTICLES_PER_PAGE);
 
-            // Sort articles by date (newest first)
             const sortedArticles = feedArticles.sort((a, b) =>
                 new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime()
             );
 
             if (page === 1) {
-                // First page - replace existing articles
                 setArticles(sortedArticles);
             } else {
-                // Subsequent pages - append to existing articles
                 setArticles(prevArticles => [...prevArticles, ...sortedArticles]);
             }
 
@@ -111,7 +98,6 @@ export default function ArticleList() {
         }
     };
 
-    // Load more articles when reaching the end of the list
     const handleLoadMore = async () => {
         if (loadingMore || !hasMoreArticles) return;
 
@@ -120,7 +106,6 @@ export default function ArticleList() {
     };
 
     useEffect(() => {
-        // Only run this effect if feed exists, is not null, and articles are loaded
         if (feed?.id) {
             const fetchUnreadArticles = async () => {
                 try {
@@ -135,7 +120,6 @@ export default function ArticleList() {
         }
     }, [articles]);
 
-    // Render footer with loading indicator or "load more" button
     const renderFooter = () => {
         if (!hasMoreArticles) {
             return (
@@ -186,7 +170,6 @@ export default function ArticleList() {
             try {
                 if (article.id) {
                     await setToRead(article.id);
-                    // Update the unread count
                     const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
                     setUnreadArticlesNumber(numberOfUnreadArticles);
                 }
@@ -198,9 +181,7 @@ export default function ArticleList() {
         const handleDelete = async () => {
             try {
                 await deleteArticle(article.url);
-                // Remove the article from the local state
                 setArticles(prevArticles => prevArticles.filter(a => a.url !== article.url));
-                // Update the unread count
                 const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
                 setUnreadArticlesNumber(numberOfUnreadArticles);
             } catch (error) {
@@ -238,9 +219,10 @@ export default function ArticleList() {
                         await setToUnread(article.id);
                         article.unread = true;
                     }
-                    // Update the unread count
                     const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
                     setUnreadArticlesNumber(numberOfUnreadArticles);
+                    // Force re-render to update the icon
+                    setArticles([...articles]);
                 }
             } catch (error) {
                 console.error('Error toggling read status:', error);
@@ -257,6 +239,8 @@ export default function ArticleList() {
                         await setToSafedForLater(article.id);
                         article.safedForLater = true;
                     }
+                    // Force re-render to update the icon
+                    setArticles([...articles]);
                 }
             } catch (error) {
                 console.error('Error toggling save for later:', error);
@@ -264,13 +248,13 @@ export default function ArticleList() {
         };
 
         return (
-            <View className="bg-primary-light dark:bg-primary-dark m-2  my-1 mx-2 flex-row items-center">
+            <View className="bg-primary-light dark:bg-primary-dark m-2 my-1 mx-2 flex-row items-center" key={`${article.id}-${article.unread}-${article.safedForLater}`}>
                 <TouchableOpacity 
                     className="w-20 bg-blue-500 h-full items-center justify-center rounded-l-2xl"
                     onPress={handleMarkReadUnread}
                 >
                     <Ionicons 
-                        name={article.unread ? "checkmark-circle-outline" : "refresh-circle-outline"} 
+                        name={article.unread ? "checkmark-circle-outline" : "checkmark-circle"} 
                         size={24} 
                         color="white" 
                     />
