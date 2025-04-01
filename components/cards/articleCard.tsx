@@ -1,8 +1,8 @@
 // components/cards/articleCard.tsx
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { Article } from "@/types/rssFeed/article.ts";
-import { useTimeAgo } from "@/hooks/useTimeAgo.ts";
+import { Article } from "@/types/rssFeed/article";
+import { useTimeAgo } from "@/hooks/useTimeAgo";
 
 export default function  ArticleCard({ article }: { article: Article }) {
     const getTimeAgo = useTimeAgo();
@@ -21,6 +21,7 @@ export default function  ArticleCard({ article }: { article: Article }) {
     return (
         <TouchableOpacity
             onPress={handlePress}
+            activeOpacity={1}
             className="bg-primary-light dark:bg-primary-dark shadow-sm shadow-accent-light dark:shadow-accent-dark m-2 rounded-2xl my-1 mx-2 p-2 flex-row items-center"
         >
             <View className="flex-1 pr-2">

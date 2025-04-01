@@ -264,9 +264,9 @@ export default function ArticleList() {
         };
 
         return (
-            <View className="flex-row h-full items-center justify-center">
+            <View className="bg-primary-light dark:bg-primary-dark m-2  my-1 mx-2 flex-row items-center">
                 <TouchableOpacity 
-                    className="w-20 bg-blue-500 h-full items-center justify-center"
+                    className="w-20 bg-blue-500 h-full items-center justify-center rounded-l-2xl"
                     onPress={handleMarkReadUnread}
                 >
                     <Ionicons 
@@ -276,7 +276,7 @@ export default function ArticleList() {
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    className="w-20 bg-yellow-500 h-full items-center justify-center"
+                    className="w-20 bg-yellow-500 h-full items-center justify-center rounded-r-2xl"
                     onPress={handleSaveForLater}
                 >
                     <Ionicons 
