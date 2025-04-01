@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { TextSettings } from '@/types/rssFeed/article.ts';
+import { TextSettings } from '@/types/rssFeed/article';
 
 interface TextSettingsModalProps {
     visible: boolean;

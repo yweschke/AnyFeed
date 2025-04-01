@@ -7,12 +7,16 @@ import { useLocalSearchParams, Stack } from 'expo-router';
 import { Article } from '@/types/rssFeed/article';
 import { Feed } from '@/types/rssFeed/feed';
 import { getFeeds } from '@/services/database/rssFeeds';
-import { getArticles, getUnreadArticlesNumberFromFeed } from '@/services/database/rssArticles';
+import { getArticles, getUnreadArticlesNumberFromFeed, setToRead, deleteArticle, setToUnread, setToNotSafedForLater, setToSafedForLater } from '@/services/database/rssArticles';
 import ArticleCard from '@/components/cards/articleCard';
 import { ThemedText } from '@/components/ThemedText';
 import { useTranslation } from 'react-i18next';
 import ArticleListHeader from '@/components/headers/articleListHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
+
 
 // Constants for pagination
 const ARTICLES_PER_PAGE = 10;
@@ -149,6 +153,7 @@ export default function ArticleList() {
             );
         }
 
+
         return (
             <TouchableOpacity
                 onPress={handleLoadMore}
@@ -176,40 +181,159 @@ export default function ArticleList() {
         );
     }
 
-    return (
-        <View className="flex-1 bg-primary-light dark:bg-primary-dark">
-            <Stack.Screen
-                name="feed"
-                options={{
-                    headerShown: false,
-                }}
-            />
-
-            <ArticleListHeader
-                feed={feed}
-                unreadArticlesCount={unreadArticlesNumber}
-                headerHeight={headerHeight}
-                unreadOpacity={unreadOpacity}
-            />
-
-            <Animated.FlatList
-                ref={flatListRef}
-                data={articles}
-                keyExtractor={(item) => item.url.toString()}
-                renderItem={({ item }) => <ArticleCard article={item} />}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: false }
-                )}
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={renderFooter}
-                ListEmptyComponent={
-                    <View className="flex-1 justify-center items-center p-8">
-                        <ThemedText>{t('feed.noArticles', 'No articles found for this feed')}</ThemedText>
-                    </View>
+    function handleLeftAction(prog: SharedValue<number>, drag: SharedValue<number>, article: Article) {
+        const handleMarkAsRead = async () => {
+            try {
+                if (article.id) {
+                    await setToRead(article.id);
+                    // Update the unread count
+                    const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
+                    setUnreadArticlesNumber(numberOfUnreadArticles);
                 }
-            />
-        </View>
+            } catch (error) {
+                console.error('Error marking article as read:', error);
+            }
+        };
+
+        const handleDelete = async () => {
+            try {
+                await deleteArticle(article.url);
+                // Remove the article from the local state
+                setArticles(prevArticles => prevArticles.filter(a => a.url !== article.url));
+                // Update the unread count
+                const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
+                setUnreadArticlesNumber(numberOfUnreadArticles);
+            } catch (error) {
+                console.error('Error deleting article:', error);
+            }
+        };
+
+        return (
+            <View className="flex-row h-full">
+                <TouchableOpacity 
+                    className="w-20 bg-blue-500 items-center justify-center"
+                    onPress={handleMarkAsRead}
+                >
+                    <Ionicons name="checkmark-circle-outline" size={24} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    className="w-20 bg-red-500 items-center justify-center"
+                    onPress={handleDelete}
+                >
+                    <Ionicons name="trash-outline" size={24} color="white" />
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+
+    function handleRightAction(prog: SharedValue<number>, drag: SharedValue<number>, article: Article) {
+        const handleMarkReadUnread = async () => {
+            try {
+                if (article.id) {
+                    if (article.unread) {
+                        await setToRead(article.id);
+                        article.unread = false;
+                    } else {
+                        await setToUnread(article.id);
+                        article.unread = true;
+                    }
+                    // Update the unread count
+                    const numberOfUnreadArticles = await getUnreadArticlesNumberFromFeed(feedId);
+                    setUnreadArticlesNumber(numberOfUnreadArticles);
+                }
+            } catch (error) {
+                console.error('Error toggling read status:', error);
+            }
+        };
+
+        const handleSaveForLater = async () => {
+            try {
+                if (article.id) {
+                    if (article.safedForLater) {
+                        await setToNotSafedForLater(article.id);
+                        article.safedForLater = false;
+                    } else {
+                        await setToSafedForLater(article.id);
+                        article.safedForLater = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling save for later:', error);
+            }
+        };
+
+        return (
+            <View className="flex-row h-full items-center justify-center">
+                <TouchableOpacity 
+                    className="w-20 bg-blue-500 h-full items-center justify-center"
+                    onPress={handleMarkReadUnread}
+                >
+                    <Ionicons 
+                        name={article.unread ? "checkmark-circle-outline" : "refresh-circle-outline"} 
+                        size={24} 
+                        color="white" 
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    className="w-20 bg-yellow-500 h-full items-center justify-center"
+                    onPress={handleSaveForLater}
+                >
+                    <Ionicons 
+                        name={article.safedForLater ? "bookmark" : "bookmark-outline"} 
+                        size={24} 
+                        color="white" 
+                    />
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    return (
+        <GestureHandlerRootView className="flex-1">
+            <View className="flex-1 bg-primary-light dark:bg-primary-dark">
+                <Stack.Screen
+                    name="feed"
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+
+                {feed && (
+                    <ArticleListHeader
+                        feed={feed}
+                        unreadArticlesCount={unreadArticlesNumber}
+                        headerHeight={headerHeight}
+                        unreadOpacity={unreadOpacity}
+                    />
+                )}
+
+                <Animated.FlatList
+                    ref={flatListRef}
+                    data={articles}
+                    keyExtractor={(item) => item.url.toString()}
+                    renderItem={({ item }) => (        
+                    <ReanimatedSwipeable
+                        friction={2}
+                        renderRightActions={(progress, drag) => handleRightAction(progress, drag, item)}
+                    >
+                        <ArticleCard article={item} />
+                    </ReanimatedSwipeable>
+                    )}
+                    onScroll={Animated.event(
+                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                        { useNativeDriver: false }
+                    )}
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
+                    ListEmptyComponent={
+                        <View className="flex-1 justify-center items-center p-8">
+                            <ThemedText>{t('feed.noArticles', 'No articles found for this feed')}</ThemedText>
+                        </View>
+                    }
+                />
+            </View>
+        </GestureHandlerRootView>
     );
 }

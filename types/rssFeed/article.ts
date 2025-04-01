@@ -29,3 +29,8 @@ export interface Image {
     url: string;
     title: string;
 }
+
+export interface TextSettings {
+    fontSize: number;
+    fontFamily: string;
+}

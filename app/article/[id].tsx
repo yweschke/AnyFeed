@@ -6,12 +6,12 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ThemedText } from '@/components/ThemedText.tsx';
-import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread, getArticles } from '@/services/database/rssArticles.ts';
-import { getFeed } from '@/services/database/rssFeeds.ts';
-import { Article } from '@/types/rssFeed/article.ts';
+import { ThemedText } from '@/components/ThemedText';
+import { getArticle, setToRead, setToNotSafedForLater, setToSafedForLater, setToUnread, getArticles } from '@/services/database/rssArticles';
+import { getFeed } from '@/services/database/rssFeeds';
+import { Article } from '@/types/rssFeed/article';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '@/hooks/useColorScheme.ts';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import TextSettingsModal, { TextSettings } from '@/components/modals/TextSettingsModal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -284,7 +284,7 @@ export default function ArticleScreen() {
         }
     };
 
-    const handleViewableItemsChanged = async ({ viewableItems }) => {
+    const handleViewableItemsChanged = async ({ viewableItems}) => {
         try {
             if (viewableItems.length > 0) {
                 const viewedArticleIndex = viewableItems[0].index;
@@ -309,7 +309,7 @@ export default function ArticleScreen() {
         }
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString(undefined, {

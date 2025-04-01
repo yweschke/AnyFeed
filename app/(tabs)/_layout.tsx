@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+// Import Platform if you need OS-specific adjustments
 import { Platform, View } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -12,6 +13,7 @@ export default function TabLayout() {
     // Use explicit hex format for all colors to ensure consistency
     const iconColor = isDark ? "#8ca0b4" : "#50647f";
     const activeColor = isDark ? '#60a5fa' : '#0284c7';
+    const iconTopOffset = 18; // Adjust this value as needed
 
     return (
         <Tabs
@@ -19,15 +21,16 @@ export default function TabLayout() {
                 tabBarActiveTintColor: isDark ? 'rgba(90, 110, 140, 1)' : 'rgba(50, 70, 100, 1)',
                 tabBarInactiveTintColor: isDark ? 'rgba(27, 38, 59, 1)' : 'rgba(119, 141, 169, 1)',
                 headerShown: false,
+                tabBarShowLabel: false,
                 tabBarButton: HapticTab,
                 tabBarStyle: {
-                    opacity: 1,
                     width: '90%',
-                    marginLeft: '5%',
+                    height: 80,
                     position: 'absolute',
                     bottom: 30,
-                    left: 30,
-                    right: 30,
+                    left: 0,
+                    right: 0,
+                    marginHorizontal: '5%',
                     borderRadius: 25,
                     elevation: 5,
                     backgroundColor: isDark ? 'rgba(13, 27, 42, 1)' : 'rgba(255, 255, 255, 1)',
@@ -35,10 +38,15 @@ export default function TabLayout() {
                     shadowOpacity: 0.2,
                     shadowOffset: { width: 0, height: 10 },
                     shadowRadius: 5,
-                    display: 'flex',
+                },
+                tabBarItemStyle: {
+                    flex: 1,
                     justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
+                },
+                tabBarIconStyle: {
+
+                   top: iconTopOffset,
+
                 }
             }}
         >
@@ -49,7 +57,7 @@ export default function TabLayout() {
                     tabBarIcon: ({ focused }) => (
                         <Ionicons
                             name="search"
-                            size={28}
+                            size={30}
                             color={focused ? activeColor : iconColor}
                             style={{ opacity: 1 }}
                         />
@@ -62,7 +70,7 @@ export default function TabLayout() {
                     title: 'Home',
                     tabBarIcon: ({ focused }) => (
                         <IconSymbol
-                            size={50}
+                            size={35}
                             name="house.fill"
                             color={focused ? activeColor : iconColor}
                             style={{ opacity: 1 }}
@@ -76,7 +84,7 @@ export default function TabLayout() {
                     title: 'Library',
                     tabBarIcon: ({ focused }) => (
                         <IconSymbol
-                            size={28}
+                            size={30}
                             name="bookmark.fill"
                             color={focused ? activeColor : iconColor}
                             style={{ opacity: 1 }}
