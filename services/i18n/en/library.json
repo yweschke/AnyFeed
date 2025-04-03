@@ -1,0 +1,10 @@
+{
+    "library": {
+        "title": "Library",
+        "cards": {
+            "savedForLater": "Saved for later",
+            "recentlyRead": "Recently read",
+            "myFeeds": "My feeds"
+        }
+    }
+}

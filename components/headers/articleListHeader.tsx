@@ -23,7 +23,7 @@ export default function ArticleListHeader({ feed, unreadArticlesCount, headerHei
                 className="text-textSecondary-light dark:text-textSecondary-dark text-2xl"
                 style={{ opacity: unreadOpacity }}
             >
-                {t('feed.articlesCount', { count: unreadArticlesCount > 1000 ? "1000+" : unreadArticlesCount }, '{{count}} unread articles in this feed!')}
+                {t('feed.articlesCount', '{{count}} unread articles in this feed!', { count: unreadArticlesCount > 1000 ? "1000+" : unreadArticlesCount })}
             </Animated.Text>
         </Animated.View>
     );

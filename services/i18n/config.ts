@@ -5,7 +5,7 @@ import home from './en/home.json';
 import feed from './en/feed.json';
 import date from './en/date.json';
 import article from './en/article.json';
-
+import library from './en/library.json';
 export const defaultNS = 'home';
 
 // Initialize i18next instance
@@ -22,7 +22,8 @@ if (!i18n.isInitialized) {
                 home,
                 feed,
                 date,
-                article
+                article,
+                library
             },
         },
         defaultNS,
