@@ -1,8 +1,8 @@
 // components/cards/articleBigCard.tsx
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { Article } from "@/types/rssFeed/article.ts";
-import { useTimeAgo } from "@/hooks/useTimeAgo.ts";
+import { Article } from "@/types/rssFeed/article";
+import { useTimeAgo } from "@/hooks/useTimeAgo";
 
 export default function ArticleBigCard({ article}: { article: Article}) {
     const getTimeAgo = useTimeAgo();
