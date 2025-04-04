@@ -31,13 +31,13 @@ export default function ArticleBigCard({ article}: { article: Article}) {
                         source={{uri: article.image.url}}
                     />
                 )}
-                <Text className="text-textPrimary-light dark:text-textPrimary-dark font-bold text-lg mt-2" numberOfLines={2}>
+                <Text className={`${article.unread ? "text-textPrimary-light dark:text-textPrimary-dark" : "text-textSecondary-light dark:text-textSecondary-dark"} font-bold text-lg mt-2`} numberOfLines={2}>
                     {article.title}
                 </Text>
-                <Text className="text-textPrimary-light dark:text-textPrimary-dark opacity-80 mt-1" numberOfLines={3}>
+                <Text className={`${article.unread ? "text-textPrimary-light dark:text-textPrimary-dark" : "text-textSecondary-light dark:text-textSecondary-dark"} opacity-80 mt-1`} numberOfLines={3}>
                     {article.description}
                 </Text>
-                <Text className="text-textPrimary-light dark:text-textPrimary-dark opacity-80 text-sm mt-1" numberOfLines={1}>
+                <Text className={`${article.unread ? "text-textPrimary-light dark:text-textPrimary-dark" : "text-textSecondary-light dark:text-textSecondary-dark"} opacity-80 text-sm mt-1`} numberOfLines={1}>
                     {timeAgo}
                 </Text>
             </View>
