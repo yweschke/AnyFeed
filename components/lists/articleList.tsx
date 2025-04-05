@@ -13,6 +13,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import { useColorScheme } from 'nativewind';
 
 const ARTICLES_PER_PAGE = 10;
 
@@ -28,6 +29,7 @@ export default function ArticleList() {
     const [unreadArticlesNumber, setUnreadArticlesNumber] = useState<number>(0);
     const { t } = useTranslation('feed');
     const flatListRef = useRef(null);
+    const { colorScheme } = useColorScheme();
 
     // Animation for article list header
     const scrollY = useRef(new Animated.Value(0)).current;
@@ -250,23 +252,23 @@ export default function ArticleList() {
         return (
             <View className="bg-primary-light dark:bg-primary-dark m-2 my-1 mx-2 flex-row items-center" key={`${article.id}-${article.unread}-${article.safedForLater}`}>
                 <TouchableOpacity 
-                    className="w-20 bg-blue-500 h-full items-center justify-center rounded-l-2xl"
-                    onPress={handleMarkReadUnread}
+                className="w-20 bg-accent-light dark:bg-accent-dark h-full items-center justify-center rounded-l-2xl"
+                onPress={handleMarkReadUnread}
                 >
                     <Ionicons 
                         name={article.unread ? "checkmark-circle-outline" : "checkmark-circle"} 
                         size={24} 
-                        color="white" 
+                        color="white"
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    className="w-20 bg-yellow-500 h-full items-center justify-center rounded-r-2xl"
+                    className="w-20 bg-accent-light dark:bg-accent-dark h-full items-center justify-center rounded-r-2xl"
                     onPress={handleSaveForLater}
                 >
                     <Ionicons 
                         name={article.safedForLater ? "bookmark" : "bookmark-outline"} 
                         size={24} 
-                        color="white" 
+                        color="white"
                     />
                 </TouchableOpacity>
             </View>
