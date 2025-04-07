@@ -83,30 +83,69 @@ export default function ArticleScreen() {
                     setLoading(false);
                     return;
                 }
-
+        
                 // First, get the current article to determine its feed
                 const currentArticle = await getArticle(initialArticleId);
-
+        
                 if (!currentArticle || !currentArticle.id) {
                     setLoading(false);
                     return;
                 }
-
+        
                 const articleFeedId = currentArticle.feedId;
                 setFeedId(articleFeedId);
-                console.log('Loading articles from feed ID:', articleFeedId);
-
+                console.log('🔍 Looking for article ID:', initialArticleId);
+        
                 // Load the feed information
                 const feedInfo = await getFeed(articleFeedId);
                 setFeed(feedInfo);
-
-                // Load the first batch of articles
-                await loadArticles(articleFeedId, 1, initialArticleId);
+        
+                // Load articles until the target article is found
+                let page = 1;
+                let found = false;
+                let combinedArticles: Article[] = [];
+        
+                while (!found) {
+                    const newArticles = await getArticles(articleFeedId, ARTICLES_PER_PAGE, (page - 1) * ARTICLES_PER_PAGE);
+                    if (newArticles.length === 0) break;
+        
+                    const sortedNewArticles = newArticles.sort((a, b) =>
+                        new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime()
+                    );
+        
+                    combinedArticles = [...combinedArticles, ...sortedNewArticles];
+        
+                    const indexInNew = sortedNewArticles.findIndex(article => article.id === initialArticleId);
+                    if (indexInNew !== -1) {
+                        const absoluteIndex = combinedArticles.length - sortedNewArticles.length + indexInNew;
+                        setCurrentArticleIndex(absoluteIndex);
+        
+                        // Optional: mark it as read
+                        if (sortedNewArticles[indexInNew].unread && sortedNewArticles[indexInNew].id) {
+                            await setToRead(sortedNewArticles[indexInNew].id);
+                            const updated = [...combinedArticles];
+                            updated[absoluteIndex] = { ...updated[absoluteIndex], unread: false };
+                            combinedArticles = updated;
+                        }
+        
+                        found = true;
+                    }
+        
+                    if (newArticles.length < ARTICLES_PER_PAGE) break; // No more pages
+                    page++;
+                }
+        
+                setArticles(combinedArticles);
+                setCurrentPage(page - 1);
+                setHasMoreArticles(combinedArticles.length % ARTICLES_PER_PAGE === 0);
             } catch (error) {
-                console.error('Error loading initial article:', error);
+                console.error('❌ Error loading initial article:', error);
+                setLoading(false);
+            } finally {
                 setLoading(false);
             }
         };
+        
 
         loadInitialArticle();
     }, [initialArticleId]);
